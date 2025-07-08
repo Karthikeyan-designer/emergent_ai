@@ -1,38 +1,239 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .App {
-    text-align: center;
+  min-height: 100vh;
 }
 
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
 }
 
-.App-link {
-    color: #61dafb;
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Custom component styles */
+.card-hover {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Status badges */
+.status-badge {
+  @apply px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.status-not-started {
+  @apply bg-gray-100 text-gray-800;
+}
+
+.status-in-progress {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.status-submitted {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-approved {
+  @apply bg-green-100 text-green-800;
+}
+
+.status-rejected {
+  @apply bg-red-100 text-red-800;
+}
+
+/* Button variations */
+.btn-primary {
+  @apply bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
+}
+
+.btn-secondary {
+  @apply bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+}
+
+.btn-success {
+  @apply bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
+}
+
+/* Form styles */
+.form-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-2;
+}
+
+/* Modal styles */
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg p-6 w-full max-w-md mx-4 max-h-96 overflow-y-auto;
+}
+
+/* Navigation styles */
+.nav-link {
+  @apply text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition duration-200;
+}
+
+.nav-link-active {
+  @apply bg-indigo-100 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium;
+}
+
+/* Dashboard card styles */
+.dashboard-card {
+  @apply bg-white overflow-hidden shadow-lg rounded-lg card-hover;
+}
+
+.dashboard-card-content {
+  @apply p-6;
+}
+
+.dashboard-card-icon {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-white font-bold;
+}
+
+/* Task card styles */
+.task-card {
+  @apply bg-white shadow-lg rounded-lg p-6 card-hover;
+}
+
+.task-header {
+  @apply flex justify-between items-start mb-4;
+}
+
+.task-title {
+  @apply text-lg font-semibold text-gray-900;
+}
+
+.task-description {
+  @apply text-gray-600 mt-1;
+}
+
+.task-actions {
+  @apply flex space-x-4 mt-4;
+}
+
+/* Workflow styles */
+.workflow-header {
+  @apply bg-white shadow-sm border-b;
+}
+
+.workflow-nav {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.workflow-nav-content {
+  @apply flex justify-between items-center h-16;
+}
+
+.workflow-title {
+  @apply text-xl font-semibold text-gray-900;
+}
+
+.workflow-main {
+  @apply max-w-7xl mx-auto py-6 sm:px-6 lg:px-8;
+}
+
+.workflow-content {
+  @apply px-4 py-6 sm:px-0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .dashboard-card-content {
+    @apply p-4;
+  }
+  
+  .task-card {
+    @apply p-4;
+  }
+  
+  .modal-content {
+    @apply max-w-sm;
+  }
+}
+
+/* Dark mode support (if needed) */
+@media (prefers-color-scheme: dark) {
+  .dark-mode {
+    @apply bg-gray-900 text-white;
+  }
+  
+  .dark-mode .card-hover {
+    @apply bg-gray-800 text-white;
+  }
+  
+  .dark-mode .form-input {
+    @apply bg-gray-800 border-gray-700 text-white;
+  }
+}
+
+/* Loading states */
+.loading-spinner {
+  @apply animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600;
+}
+
+.loading-skeleton {
+  @apply animate-pulse bg-gray-300 rounded;
+}
+
+/* Notification styles */
+.notification {
+  @apply fixed top-4 right-4 max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg z-50;
+}
+
+.notification-success {
+  @apply bg-green-50 border-green-200;
+}
+
+.notification-error {
+  @apply bg-red-50 border-red-200;
+}
+
+.notification-info {
+  @apply bg-blue-50 border-blue-200;
+}
+
+.notification-warning {
+  @apply bg-yellow-50 border-yellow-200;
 }
