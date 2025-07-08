@@ -839,22 +839,22 @@ const CreateWorkflow = () => {
   };
 
   if (user?.role !== 'admin') {
-    return <div className="flex justify-center items-center h-screen">Unauthorized</div>;
+    return <div className="flex justify-center items-center h-screen bg-slate-900 text-white">Unauthorized</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-slate-900">
+      <nav className="bg-slate-800 shadow-lg border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <button
                 onClick={() => window.location.href = '/dashboard'}
-                className="text-indigo-600 hover:text-indigo-800 mr-4"
+                className="text-blue-400 hover:text-blue-300 mr-4"
               >
                 ← Back to Dashboard
               </button>
-              <h1 className="text-xl font-semibold text-gray-900">Create Workflow</h1>
+              <h1 className="text-xl font-semibold text-white">Create Workflow</h1>
             </div>
           </div>
         </div>
@@ -862,29 +862,29 @@ const CreateWorkflow = () => {
 
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="bg-white shadow-lg rounded-lg p-6">
+          <div className="bg-slate-800 shadow-lg rounded-lg p-6 border border-slate-700">
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Workflow Name
                 </label>
                 <input
                   type="text"
                   value={workflowName}
                   onChange={(e) => setWorkflowName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                   placeholder="Enter workflow name"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Description
                 </label>
                 <textarea
                   value={workflowDescription}
                   onChange={(e) => setWorkflowDescription(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                   rows="3"
                   placeholder="Describe the workflow"
                 />
@@ -892,10 +892,10 @@ const CreateWorkflow = () => {
 
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium text-gray-900">Tasks</h3>
+                  <h3 className="text-lg font-medium text-white">Tasks</h3>
                   <button
                     onClick={() => setShowTaskModal(true)}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
                   >
                     Add Task
                   </button>
@@ -903,10 +903,10 @@ const CreateWorkflow = () => {
 
                 <div className="space-y-4">
                   {tasks.map((task, index) => (
-                    <div key={task.id} className="border border-gray-200 rounded-lg p-4">
-                      <h4 className="font-medium text-gray-900">{task.title}</h4>
-                      <p className="text-gray-600 text-sm mt-1">{task.description}</p>
-                      <div className="mt-2 text-xs text-gray-500">
+                    <div key={task.id} className="border border-slate-600 rounded-lg p-4 bg-slate-700">
+                      <h4 className="font-medium text-white">{task.title}</h4>
+                      <p className="text-slate-300 text-sm mt-1">{task.description}</p>
+                      <div className="mt-2 text-xs text-slate-400">
                         Assignee: {users.find(u => u.id === task.assignee_id)?.name || 'Unknown'} |
                         Approver: {users.find(u => u.id === task.approver_id)?.name || 'Unknown'}
                       </div>
@@ -919,13 +919,13 @@ const CreateWorkflow = () => {
                 <button
                   onClick={handleCreateWorkflow}
                   disabled={!workflowName || tasks.length === 0}
-                  className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-200 disabled:bg-gray-300"
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200 disabled:bg-slate-600"
                 >
                   Create Workflow
                 </button>
                 <button
                   onClick={() => window.location.href = '/dashboard'}
-                  className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
+                  className="bg-slate-600 text-white px-6 py-2 rounded-lg hover:bg-slate-500 transition duration-200"
                 >
                   Cancel
                 </button>
@@ -938,43 +938,43 @@ const CreateWorkflow = () => {
       {/* Add Task Modal */}
       {showTaskModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">Add Task</h2>
+          <div className="bg-slate-800 rounded-lg p-6 w-full max-w-md border border-slate-700">
+            <h2 className="text-xl font-semibold mb-4 text-white">Add Task</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Task Title
                 </label>
                 <input
                   type="text"
                   value={currentTask.title}
                   onChange={(e) => setCurrentTask({ ...currentTask, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                   placeholder="Enter task title"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Description
                 </label>
                 <textarea
                   value={currentTask.description}
                   onChange={(e) => setCurrentTask({ ...currentTask, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                   rows="3"
                   placeholder="Describe the task"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Assignee
                 </label>
                 <select
                   value={currentTask.assignee_id}
                   onChange={(e) => setCurrentTask({ ...currentTask, assignee_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                 >
                   <option value="">Select assignee</option>
                   {users.filter(u => u.role === 'assignee').map(user => (
@@ -984,13 +984,13 @@ const CreateWorkflow = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Approver
                 </label>
                 <select
                   value={currentTask.approver_id}
                   onChange={(e) => setCurrentTask({ ...currentTask, approver_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                 >
                   <option value="">Select approver</option>
                   {users.filter(u => u.role === 'approver').map(user => (
@@ -1003,13 +1003,13 @@ const CreateWorkflow = () => {
             <div className="flex space-x-4 mt-6">
               <button
                 onClick={handleAddTask}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
               >
                 Add Task
               </button>
               <button
                 onClick={() => setShowTaskModal(false)}
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
+                className="bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-500 transition duration-200"
               >
                 Cancel
               </button>
