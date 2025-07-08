@@ -222,13 +222,18 @@ const Login = () => {
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const [dashboardData, setDashboardData] = useState(null);
+  const [workflows, setWorkflows] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const response = await axios.get(`${API}/dashboard`);
-        setDashboardData(response.data);
+        const [dashboardResponse, workflowsResponse] = await Promise.all([
+          axios.get(`${API}/dashboard`),
+          axios.get(`${API}/workflows`)
+        ]);
+        setDashboardData(dashboardResponse.data);
+        setWorkflows(workflowsResponse.data);
       } catch (error) {
         console.error('Error fetching dashboard:', error);
       } finally {
@@ -240,25 +245,25 @@ const Dashboard = () => {
   }, []);
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return <div className="flex justify-center items-center h-screen bg-slate-900 text-white">Loading...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-slate-900">
+      <nav className="bg-slate-800 shadow-lg border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">Workflow Manager</h1>
+              <h1 className="text-xl font-semibold text-white">Workflow Manager</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
-              <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full capitalize">
+              <span className="text-sm text-slate-300">Welcome, {user?.name}</span>
+              <span className="px-2 py-1 bg-blue-600 text-white text-xs rounded-full capitalize">
                 {user?.role}
               </span>
               <button
                 onClick={logout}
-                className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                className="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 Logout
               </button>
@@ -269,55 +274,55 @@ const Dashboard = () => {
 
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">Dashboard</h2>
           
           {dashboardData && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {dashboardData.role === 'admin' && (
                 <>
-                  <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
                     <div className="p-6">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                             <span className="text-white font-bold">W</span>
                           </div>
                         </div>
                         <div className="ml-4">
-                          <h3 className="text-lg font-medium text-gray-900">Total Workflows</h3>
-                          <p className="text-3xl font-bold text-indigo-600">{dashboardData.total_workflows}</p>
+                          <h3 className="text-lg font-medium text-white">Total Workflows</h3>
+                          <p className="text-3xl font-bold text-blue-400">{dashboardData.total_workflows}</p>
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
                     <div className="p-6">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                             <span className="text-white font-bold">T</span>
                           </div>
                         </div>
                         <div className="ml-4">
-                          <h3 className="text-lg font-medium text-gray-900">Total Tasks</h3>
-                          <p className="text-3xl font-bold text-green-600">{dashboardData.total_tasks}</p>
+                          <h3 className="text-lg font-medium text-white">Total Tasks</h3>
+                          <p className="text-3xl font-bold text-blue-400">{dashboardData.total_tasks}</p>
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
                     <div className="p-6">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                             <span className="text-white font-bold">P</span>
                           </div>
                         </div>
                         <div className="ml-4">
-                          <h3 className="text-lg font-medium text-gray-900">Pending Approvals</h3>
-                          <p className="text-3xl font-bold text-yellow-600">{dashboardData.pending_approvals}</p>
+                          <h3 className="text-lg font-medium text-white">Pending Approvals</h3>
+                          <p className="text-3xl font-bold text-blue-400">{dashboardData.pending_approvals}</p>
                         </div>
                       </div>
                     </div>
@@ -327,49 +332,49 @@ const Dashboard = () => {
               
               {dashboardData.role === 'assignee' && (
                 <>
-                  <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
                     <div className="p-6">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                             <span className="text-white font-bold">M</span>
                           </div>
                         </div>
                         <div className="ml-4">
-                          <h3 className="text-lg font-medium text-gray-900">My Tasks</h3>
-                          <p className="text-3xl font-bold text-blue-600">{dashboardData.my_tasks}</p>
+                          <h3 className="text-lg font-medium text-white">My Tasks</h3>
+                          <p className="text-3xl font-bold text-blue-400">{dashboardData.my_tasks}</p>
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
                     <div className="p-6">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                             <span className="text-white font-bold">C</span>
                           </div>
                         </div>
                         <div className="ml-4">
-                          <h3 className="text-lg font-medium text-gray-900">Completed Tasks</h3>
-                          <p className="text-3xl font-bold text-green-600">{dashboardData.completed_tasks}</p>
+                          <h3 className="text-lg font-medium text-white">Completed Tasks</h3>
+                          <p className="text-3xl font-bold text-blue-400">{dashboardData.completed_tasks}</p>
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
                     <div className="p-6">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                             <span className="text-white font-bold">P</span>
                           </div>
                         </div>
                         <div className="ml-4">
-                          <h3 className="text-lg font-medium text-gray-900">Pending Tasks</h3>
-                          <p className="text-3xl font-bold text-orange-600">{dashboardData.pending_tasks}</p>
+                          <h3 className="text-lg font-medium text-white">Pending Tasks</h3>
+                          <p className="text-3xl font-bold text-blue-400">{dashboardData.pending_tasks}</p>
                         </div>
                       </div>
                     </div>
@@ -379,49 +384,49 @@ const Dashboard = () => {
               
               {dashboardData.role === 'approver' && (
                 <>
-                  <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
                     <div className="p-6">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                             <span className="text-white font-bold">P</span>
                           </div>
                         </div>
                         <div className="ml-4">
-                          <h3 className="text-lg font-medium text-gray-900">Pending Approvals</h3>
-                          <p className="text-3xl font-bold text-red-600">{dashboardData.pending_approvals}</p>
+                          <h3 className="text-lg font-medium text-white">Pending Approvals</h3>
+                          <p className="text-3xl font-bold text-blue-400">{dashboardData.pending_approvals}</p>
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
                     <div className="p-6">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                             <span className="text-white font-bold">A</span>
                           </div>
                         </div>
                         <div className="ml-4">
-                          <h3 className="text-lg font-medium text-gray-900">Approved Tasks</h3>
-                          <p className="text-3xl font-bold text-green-600">{dashboardData.approved_tasks}</p>
+                          <h3 className="text-lg font-medium text-white">Approved Tasks</h3>
+                          <p className="text-3xl font-bold text-blue-400">{dashboardData.approved_tasks}</p>
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white overflow-hidden shadow-lg rounded-lg">
+                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
                     <div className="p-6">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                             <span className="text-white font-bold">R</span>
                           </div>
                         </div>
                         <div className="ml-4">
-                          <h3 className="text-lg font-medium text-gray-900">Rejected Tasks</h3>
-                          <p className="text-3xl font-bold text-gray-600">{dashboardData.rejected_tasks}</p>
+                          <h3 className="text-lg font-medium text-white">Rejected Tasks</h3>
+                          <p className="text-3xl font-bold text-blue-400">{dashboardData.rejected_tasks}</p>
                         </div>
                       </div>
                     </div>
@@ -430,24 +435,77 @@ const Dashboard = () => {
               )}
             </div>
           )}
+
+          {/* Workflows Section */}
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-white mb-4">Workflows</h3>
+            <div className="bg-slate-800 shadow-lg rounded-lg border border-slate-700">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-slate-700">
+                  <thead className="bg-slate-700">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                        Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                        Description
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                        Created At
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-slate-800 divide-y divide-slate-700">
+                    {workflows.length > 0 ? workflows.map((workflow) => (
+                      <tr key={workflow.id} className="hover:bg-slate-700">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                          {workflow.name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                          {workflow.description}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                          {new Date(workflow.created_at).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-600 text-white">
+                            {workflow.is_active ? 'Active' : 'Inactive'}
+                          </span>
+                        </td>
+                      </tr>
+                    )) : (
+                      <tr>
+                        <td colSpan="4" className="px-6 py-4 text-center text-sm text-slate-400">
+                          No workflows created yet
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
           
           <div className="mt-8 flex space-x-4">
             <button
               onClick={() => window.location.href = '/workflows'}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
             >
               View Workflows
             </button>
             <button
               onClick={() => window.location.href = '/tasks'}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
             >
               View Tasks
             </button>
             {user?.role === 'admin' && (
               <button
                 onClick={() => window.location.href = '/create-workflow'}
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition duration-200"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
               >
                 Create Workflow
               </button>
