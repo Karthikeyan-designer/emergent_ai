@@ -575,22 +575,22 @@ const Tasks = () => {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return <div className="flex justify-center items-center h-screen bg-slate-900 text-white">Loading...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-slate-900">
+      <nav className="bg-slate-800 shadow-lg border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <button
                 onClick={() => window.location.href = '/dashboard'}
-                className="text-indigo-600 hover:text-indigo-800 mr-4"
+                className="text-blue-400 hover:text-blue-300 mr-4"
               >
                 ← Back to Dashboard
               </button>
-              <h1 className="text-xl font-semibold text-gray-900">Tasks</h1>
+              <h1 className="text-xl font-semibold text-white">Tasks</h1>
             </div>
           </div>
         </div>
@@ -598,54 +598,91 @@ const Tasks = () => {
 
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="grid gap-6">
-            {tasks.map((task) => (
-              <div key={task.id} className="bg-white shadow-lg rounded-lg p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{task.title}</h3>
-                    <p className="text-gray-600 mt-1">{task.description}</p>
-                  </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    task.status === 'approved' ? 'bg-green-100 text-green-800' :
-                    task.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                    task.status === 'submitted' ? 'bg-yellow-100 text-yellow-800' :
-                    task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {task.status.replace('_', ' ')}
-                  </span>
-                </div>
+          <div className="bg-slate-800 shadow-lg rounded-lg border border-slate-700">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-700">
+                <thead className="bg-slate-700">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Task Title
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Description
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Deadline
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-slate-800 divide-y divide-slate-700">
+                  {tasks.length > 0 ? tasks.map((task) => (
+                    <tr key={task.id} className="hover:bg-slate-700">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                        {task.title}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-300 max-w-xs truncate">
+                        {task.description}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          task.status === 'approved' ? 'bg-green-100 text-green-800' :
+                          task.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                          task.status === 'submitted' ? 'bg-yellow-100 text-yellow-800' :
+                          task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {task.status.replace('_', ' ')}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {task.deadline ? new Date(task.deadline).toLocaleDateString() : 'No deadline'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex space-x-2">
+                          {user?.role === 'assignee' && task.assignee_id === user.id && 
+                           (task.status === 'not_started' || task.status === 'in_progress') && (
+                            <button
+                              onClick={() => {
+                                setSelectedTask(task);
+                                setShowSubmissionModal(true);
+                              }}
+                              className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition duration-200"
+                            >
+                              Submit
+                            </button>
+                          )}
 
-                <div className="flex space-x-4 mt-4">
-                  {user?.role === 'assignee' && task.assignee_id === user.id && 
-                   (task.status === 'not_started' || task.status === 'in_progress') && (
-                    <button
-                      onClick={() => {
-                        setSelectedTask(task);
-                        setShowSubmissionModal(true);
-                      }}
-                      className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200"
-                    >
-                      Submit Task
-                    </button>
+                          {user?.role === 'approver' && task.approver_id === user.id && 
+                           task.status === 'submitted' && (
+                            <button
+                              onClick={() => {
+                                setSelectedTask(task);
+                                setShowApprovalModal(true);
+                              }}
+                              className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition duration-200"
+                            >
+                              Review
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan="5" className="px-6 py-4 text-center text-sm text-slate-400">
+                        No tasks found
+                      </td>
+                    </tr>
                   )}
-
-                  {user?.role === 'approver' && task.approver_id === user.id && 
-                   task.status === 'submitted' && (
-                    <button
-                      onClick={() => {
-                        setSelectedTask(task);
-                        setShowApprovalModal(true);
-                      }}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200"
-                    >
-                      Review Task
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -653,16 +690,16 @@ const Tasks = () => {
       {/* Task Submission Modal */}
       {showSubmissionModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">Submit Task</h2>
+          <div className="bg-slate-800 rounded-lg p-6 w-full max-w-md border border-slate-700">
+            <h2 className="text-xl font-semibold mb-4 text-white">Submit Task</h2>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-300 mb-2">
                 Task Submission
               </label>
               <textarea
                 value={submissionContent}
                 onChange={(e) => setSubmissionContent(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                 rows="4"
                 placeholder="Describe your completed work..."
               />
@@ -670,13 +707,13 @@ const Tasks = () => {
             <div className="flex space-x-4">
               <button
                 onClick={handleTaskSubmit}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
               >
                 Submit
               </button>
               <button
                 onClick={() => setShowSubmissionModal(false)}
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
+                className="bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-500 transition duration-200"
               >
                 Cancel
               </button>
@@ -688,20 +725,20 @@ const Tasks = () => {
       {/* Task Approval Modal */}
       {showApprovalModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">Review Task</h2>
+          <div className="bg-slate-800 rounded-lg p-6 w-full max-w-md border border-slate-700">
+            <h2 className="text-xl font-semibold mb-4 text-white">Review Task</h2>
             <div className="mb-4">
-              <h3 className="font-medium text-gray-900">{selectedTask?.title}</h3>
-              <p className="text-gray-600 text-sm mt-1">{selectedTask?.description}</p>
+              <h3 className="font-medium text-white">{selectedTask?.title}</h3>
+              <p className="text-slate-300 text-sm mt-1">{selectedTask?.description}</p>
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-300 mb-2">
                 Comments
               </label>
               <textarea
                 value={approvalComments}
                 onChange={(e) => setApprovalComments(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                 rows="3"
                 placeholder="Add your feedback..."
               />
@@ -721,7 +758,7 @@ const Tasks = () => {
               </button>
               <button
                 onClick={() => setShowApprovalModal(false)}
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
+                className="bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-500 transition duration-200"
               >
                 Cancel
               </button>
