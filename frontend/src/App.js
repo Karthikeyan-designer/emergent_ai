@@ -146,49 +146,49 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {!isLogin && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+              <label className="form-label">Name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-input"
                 placeholder="Enter your name"
               />
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <label className="form-label">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
               placeholder="Enter your email"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <label className="form-label">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
               placeholder="Enter your password"
             />
           </div>
 
           {!isLogin && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+              <label className="form-label">Role</label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-input"
               >
                 <option value="assignee">Assignee</option>
                 <option value="approver">Approver</option>
@@ -199,7 +199,7 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
+            className="w-full btn-primary focus-ring"
           >
             {isLogin ? 'Sign In' : 'Create Account'}
           </button>
@@ -208,7 +208,7 @@ const Login = () => {
         <div className="mt-6 text-center">
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-600 hover:text-blue-800 font-medium"
+            className="text-primary hover:text-blue-800 font-medium"
           >
             {isLogin ? 'Need an account? Sign up' : 'Already have an account? Sign in'}
           </button>
@@ -265,7 +265,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="loading-spinner"></div>
       </div>
     );
   }
@@ -279,7 +279,7 @@ const Dashboard = () => {
             <div className="flex items-center">
               <div className="flex items-center mr-10">
                 <div className="flex items-center">
-                  <svg className="w-8 h-8 text-blue-600 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="w-8 h-8 text-primary mr-2" viewBox="0 0 24 24" fill="currentColor">
                     <circle cx="12" cy="12" r="2" />
                     <circle cx="12" cy="4" r="2" />
                     <circle cx="12" cy="20" r="2" />
@@ -291,10 +291,10 @@ const Dashboard = () => {
                 </div>
               </div>
               <nav className="flex space-x-8">
-                <a href="#" className="text-blue-600 font-medium px-3 py-2">Home</a>
-                <a href="/workflows" className="text-gray-600 hover:text-gray-900 px-3 py-2">Workflow</a>
-                <a href="/tasks" className="text-gray-600 hover:text-gray-900 px-3 py-2">Task</a>
-                <a href="#" className="text-gray-600 hover:text-gray-900 px-3 py-2">Users</a>
+                <a href="#" className="nav-link-active">Home</a>
+                <a href="/workflows" className="nav-link">Workflow</a>
+                <a href="/tasks" className="nav-link">Task</a>
+                <a href="#" className="nav-link">Users</a>
               </nav>
             </div>
             <div className="flex items-center space-x-4">
@@ -323,7 +323,7 @@ const Dashboard = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-6">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-2xl p-8 mb-8 text-white relative overflow-hidden">
+        <div className="bg-gradient-workflow rounded-2xl p-8 mb-8 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-blue-900/20"></div>
           <div className="relative z-10">
             <div className="flex justify-between items-center">
@@ -375,13 +375,13 @@ const Dashboard = () => {
                 <p className="text-sm text-gray-600 mb-1">Active tasks</p>
                 <p className="text-3xl font-bold text-gray-900">{getActiveTasks()}</p>
               </div>
-              <button className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white hover:bg-blue-600 transition-colors">
+              <button className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white hover:bg-blue-600 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
               </button>
             </div>
-            <p className="text-sm text-blue-600 font-medium">Add</p>
+            <p className="text-sm text-primary font-medium">Add</p>
           </div>
 
           {/* Completion Rate Card */}
@@ -396,7 +396,7 @@ const Dashboard = () => {
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center mb-2">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
               </div>
@@ -411,7 +411,7 @@ const Dashboard = () => {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-bold text-gray-900">Recent Workflows</h3>
-            <button className="text-blue-600 hover:text-blue-800 font-medium">View all</button>
+            <button className="text-primary hover:text-blue-800 font-medium">View all</button>
           </div>
 
           <div className="grid grid-cols-2 gap-6">
@@ -466,7 +466,7 @@ const Dashboard = () => {
             </div>
 
             {/* Product Development Workflow */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border-l-4 border-blue-500">
+            <div className="bg-white rounded-xl p-6 shadow-sm border-l-4 border-primary">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
@@ -508,7 +508,7 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className="ml-4">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                  <span className="px-3 py-1 bg-blue-100 text-primary rounded-full text-xs font-medium">
                     Planning
                   </span>
                 </div>
@@ -521,26 +521,649 @@ const Dashboard = () => {
         <div className="flex space-x-4">
           <button
             onClick={() => window.location.href = '/workflows'}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200 font-medium"
+            className="btn-primary"
           >
             View All Workflows
           </button>
           <button
             onClick={() => window.location.href = '/tasks'}
-            className="bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-gray-50 transition duration-200 font-medium border border-blue-600"
+            className="bg-white text-primary px-6 py-3 rounded-lg hover:bg-gray-50 transition duration-200 font-medium border border-primary"
           >
             View Tasks
           </button>
           {user?.role === 'admin' && (
             <button
               onClick={() => window.location.href = '/create-workflow'}
-              className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-200 font-medium"
+              className="btn-success"
             >
               Create Workflow
             </button>
           )}
         </div>
       </main>
+    </div>
+  );
+};
+
+// Create Workflow Component
+const CreateWorkflow = () => {
+  const { user } = useAuth();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [workflowData, setWorkflowData] = useState({
+    name: '',
+    description: '',
+    category: 'Project Management',
+    priority: 'Low'
+  });
+  const [tasks, setTasks] = useState([]);
+  const [transitions, setTransitions] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showTransitionModal, setShowTransitionModal] = useState(false);
+  const [currentTask, setCurrentTask] = useState({
+    title: '',
+    description: '',
+    assignee_id: '',
+    approver_id: '',
+    duration: '2d 3h:30m'
+  });
+  const [currentTransition, setCurrentTransition] = useState({
+    sourceTask: '',
+    condition: 'Approved',
+    targetTasks: []
+  });
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(`${API}/users`);
+        setUsers(response.data);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
+    if (user?.role === 'admin') {
+      fetchUsers();
+    }
+  }, [user]);
+
+  const handleNext = () => {
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleAddTask = () => {
+    if (currentTask.title && currentTask.assignee_id && currentTask.approver_id) {
+      setTasks([...tasks, { ...currentTask, id: Date.now().toString(), number: tasks.length + 1 }]);
+      setCurrentTask({
+        title: '',
+        description: '',
+        assignee_id: '',
+        approver_id: '',
+        duration: '2d 3h:30m'
+      });
+      setShowTaskModal(false);
+    }
+  };
+
+  const handleAddTransition = () => {
+    if (currentTransition.sourceTask && currentTransition.targetTasks.length > 0) {
+      setTransitions([...transitions, { ...currentTransition, id: Date.now().toString() }]);
+      setCurrentTransition({
+        sourceTask: '',
+        condition: 'Approved',
+        targetTasks: []
+      });
+      setShowTransitionModal(false);
+    }
+  };
+
+  const handleRemoveTask = (taskId) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
+  };
+
+  const handleRemoveTransition = (transitionId) => {
+    setTransitions(transitions.filter(transition => transition.id !== transitionId));
+  };
+
+  const handlePublish = async () => {
+    try {
+      // Create workflow
+      const workflowResponse = await axios.post(`${API}/workflows`, {
+        name: workflowData.name,
+        description: workflowData.description
+      });
+
+      const workflowId = workflowResponse.data.id;
+
+      // Create tasks with transitions
+      for (const task of tasks) {
+        const taskTransitions = transitions
+          .filter(t => t.sourceTask === task.title)
+          .map(t => ({
+            transition_type: t.condition.toLowerCase(),
+            target_task_ids: t.targetTasks,
+            is_automatic: true
+          }));
+
+        await axios.post(`${API}/workflows/${workflowId}/tasks`, {
+          title: task.title,
+          description: task.description,
+          assignee_id: task.assignee_id,
+          approver_id: task.approver_id,
+          transitions: taskTransitions
+        });
+      }
+
+      alert('Workflow published successfully!');
+      window.location.href = '/dashboard';
+    } catch (error) {
+      console.error('Error publishing workflow:', error);
+      alert('Error publishing workflow');
+    }
+  };
+
+  if (user?.role !== 'admin') {
+    return <div className="flex justify-center items-center h-screen bg-gray-100">Unauthorized</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <div className="flex items-center mr-10">
+                <div className="flex items-center">
+                  <svg className="w-8 h-8 text-primary mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="12" r="2" />
+                    <circle cx="12" cy="4" r="2" />
+                    <circle cx="12" cy="20" r="2" />
+                    <circle cx="4" cy="12" r="2" />
+                    <circle cx="20" cy="12" r="2" />
+                    <path d="M12 6v4m0 4v4m-6-6h4m4 0h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                  <h1 className="text-xl font-bold text-gray-900">Workflow</h1>
+                </div>
+              </div>
+              <nav className="flex space-x-8">
+                <a href="/dashboard" className="nav-link-active">Home</a>
+                <a href="/workflows" className="nav-link">Workflow</a>
+                <a href="/tasks" className="nav-link">Task</a>
+                <a href="#" className="nav-link">Users</a>
+              </nav>
+            </div>
+            <div className="flex items-center space-x-4">
+              <button className="p-2 text-gray-400 hover:text-gray-600">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM15 17H9a6 6 0 010-12h6m0 12v-5" />
+                </svg>
+              </button>
+              <div className="flex items-center space-x-3">
+                <span className="text-sm font-medium text-gray-700">{user?.name || 'Vinoth'}</span>
+                <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-medium text-white">{(user?.name || 'Vinoth').charAt(0)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Breadcrumb */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-3">
+          <div className="flex items-center text-sm text-gray-500">
+            <a href="/dashboard" className="hover:text-gray-700">Home</a>
+            <svg className="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+            </svg>
+            <span>Create new workflow</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-8">New Workflow</h1>
+
+        {/* Step Indicator */}
+        <div className="step-indicator mb-8">
+          <div className={`step ${currentStep >= 1 ? (currentStep === 1 ? 'step-active' : 'step-completed') : 'step-inactive'}`}>
+            <div className="step-number">
+              {currentStep > 1 ? '✓' : '1'}
+            </div>
+            <div className="step-label">Flow Information</div>
+          </div>
+          <div className={`step-line ${currentStep > 1 ? 'step-line-completed' : 'step-line-inactive'}`}></div>
+          
+          <div className={`step ${currentStep >= 2 ? (currentStep === 2 ? 'step-active' : 'step-completed') : 'step-inactive'}`}>
+            <div className="step-number">
+              {currentStep > 2 ? '✓' : '2'}
+            </div>
+            <div className="step-label">Task Creation</div>
+          </div>
+          <div className={`step-line ${currentStep > 2 ? 'step-line-completed' : 'step-line-inactive'}`}></div>
+          
+          <div className={`step ${currentStep >= 3 ? 'step-active' : 'step-inactive'}`}>
+            <div className="step-number">3</div>
+            <div className="step-label">Transition</div>
+          </div>
+        </div>
+
+        {/* Step Content */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          {currentStep === 1 && (
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Flow Information</h2>
+              
+              <div className="space-y-6">
+                <div>
+                  <label className="form-label">
+                    Workflow name
+                    <span className="text-gray-400 ml-2">Choose a clear, descriptive name for your workflow</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={workflowData.name}
+                    onChange={(e) => setWorkflowData({ ...workflowData, name: e.target.value })}
+                    className="form-input"
+                    placeholder="e.g. Product Design"
+                  />
+                </div>
+
+                <div>
+                  <label className="form-label">Description</label>
+                  <textarea
+                    value={workflowData.description}
+                    onChange={(e) => setWorkflowData({ ...workflowData, description: e.target.value })}
+                    className="form-input"
+                    rows="4"
+                    placeholder="Describe what this workflow accomplishes"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="form-label">Category</label>
+                    <select
+                      value={workflowData.category}
+                      onChange={(e) => setWorkflowData({ ...workflowData, category: e.target.value })}
+                      className="form-input"
+                    >
+                      <option value="Project Management">Project Management</option>
+                      <option value="Development">Development</option>
+                      <option value="Design">Design</option>
+                      <option value="Marketing">Marketing</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="form-label">Priority</label>
+                    <select
+                      value={workflowData.priority}
+                      onChange={(e) => setWorkflowData({ ...workflowData, priority: e.target.value })}
+                      className="form-input"
+                    >
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-4 mt-8">
+                <button
+                  onClick={() => window.location.href = '/dashboard'}
+                  className="btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleNext}
+                  disabled={!workflowData.name}
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
+          {currentStep === 2 && (
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Task Creation</h2>
+                <button
+                  onClick={() => setShowTaskModal(true)}
+                  className="btn-primary flex items-center"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Task
+                </button>
+              </div>
+
+              {tasks.length === 0 ? (
+                <div className="text-center py-16">
+                  <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  <p className="text-gray-500">Create tasks to start building your workflow</p>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-center mb-4">
+                    <div className="task-number">{tasks.length}</div>
+                    <h3 className="text-lg font-semibold text-gray-900 ml-3">Created Tasks</h3>
+                  </div>
+
+                  <div className="space-y-4">
+                    {tasks.map((task, index) => (
+                      <div key={task.id} className="task-card">
+                        <div className="task-header">
+                          <div className="task-number">{task.number}</div>
+                          <h4 className="task-title">{task.title}</h4>
+                          <div className="ml-auto flex items-center space-x-2">
+                            <button
+                              onClick={() => handleRemoveTask(task.id)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                        <div className="task-meta">
+                          Assignee: {users.find(u => u.id === task.assignee_id)?.name || 'Unknown'} → 
+                          Approver: {users.find(u => u.id === task.approver_id)?.name || 'Unknown'} | 
+                          Duration: {task.duration}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-6 text-center">
+                    <p className="text-sm text-orange-600 flex items-center justify-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      Add at least 2 tasks to create a workflow
+                    </p>
+                    <button
+                      onClick={handleNext}
+                      disabled={tasks.length < 2}
+                      className="btn-primary mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Build Transition
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-between mt-8">
+                <button
+                  onClick={handleBack}
+                  className="btn-secondary"
+                >
+                  Back
+                </button>
+              </div>
+            </div>
+          )}
+
+          {currentStep === 3 && (
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Transition</h2>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-sm text-blue-600">
+                  If a task needs corrections, it remains assigned to the same person. The workflow pauses until corrections are made and re-approved.
+                </p>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Create transition rule</h3>
+                
+                <div className="grid grid-cols-3 gap-6">
+                  <div>
+                    <label className="form-label">Source task</label>
+                    <select
+                      value={currentTransition.sourceTask}
+                      onChange={(e) => setCurrentTransition({ ...currentTransition, sourceTask: e.target.value })}
+                      className="form-input"
+                    >
+                      <option value="">Choose the task that triggers the transition</option>
+                      {tasks.map(task => (
+                        <option key={task.id} value={task.title}>{task.title}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="form-label">Condition</label>
+                    <select
+                      value={currentTransition.condition}
+                      onChange={(e) => setCurrentTransition({ ...currentTransition, condition: e.target.value })}
+                      className="form-input"
+                    >
+                      <option value="Approved">Approved</option>
+                      <option value="Rejected">Rejected</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="form-label">Then start task(s)</label>
+                    <select
+                      multiple
+                      value={currentTransition.targetTasks}
+                      onChange={(e) => setCurrentTransition({ 
+                        ...currentTransition, 
+                        targetTasks: Array.from(e.target.selectedOptions, option => option.value)
+                      })}
+                      className="form-input"
+                    >
+                      {tasks.filter(task => task.title !== currentTransition.sourceTask).map(task => (
+                        <option key={task.id} value={task.title}>{task.title}</option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">Select the next task(s) to start</p>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center mt-4">
+                  <button
+                    onClick={() => setCurrentTransition({
+                      sourceTask: '',
+                      condition: 'Approved',
+                      targetTasks: []
+                    })}
+                    className="btn-secondary"
+                  >
+                    Reset
+                  </button>
+                  <button
+                    onClick={handleAddTransition}
+                    disabled={!currentTransition.sourceTask || currentTransition.targetTasks.length === 0}
+                    className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Add Transition
+                  </button>
+                </div>
+              </div>
+
+              {transitions.length > 0 && (
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <table className="transition-table">
+                    <thead>
+                      <tr>
+                        <th>Source task</th>
+                        <th>Condition</th>
+                        <th>Then start task(s)</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {transitions.map((transition) => (
+                        <tr key={transition.id}>
+                          <td>{transition.sourceTask}</td>
+                          <td>
+                            <span className={transition.condition === 'Approved' ? 'condition-approved' : 'condition-rejected'}>
+                              {transition.condition}
+                            </span>
+                          </td>
+                          <td>
+                            <div className="flex flex-wrap gap-1">
+                              {transition.targetTasks.map((task, index) => (
+                                <span key={index} className="task-tag">
+                                  {task}
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                          <td>
+                            <button
+                              onClick={() => handleRemoveTransition(transition.id)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              <div className="flex justify-between items-center mt-8">
+                <button
+                  onClick={handleBack}
+                  className="btn-secondary"
+                >
+                  Back
+                </button>
+                <div className="flex space-x-4">
+                  <button
+                    onClick={() => alert('Workflow saved as draft!')}
+                    className="btn-secondary"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={handlePublish}
+                    className="btn-primary"
+                  >
+                    Publish
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Task Creation Modal */}
+      {showTaskModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2 className="text-xl font-semibold mb-4">Add Task</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="form-label">Task Title</label>
+                <input
+                  type="text"
+                  value={currentTask.title}
+                  onChange={(e) => setCurrentTask({ ...currentTask, title: e.target.value })}
+                  className="form-input"
+                  placeholder="Enter task title"
+                />
+              </div>
+
+              <div>
+                <label className="form-label">Description</label>
+                <textarea
+                  value={currentTask.description}
+                  onChange={(e) => setCurrentTask({ ...currentTask, description: e.target.value })}
+                  className="form-input"
+                  rows="3"
+                  placeholder="Describe the task"
+                />
+              </div>
+
+              <div>
+                <label className="form-label">Assignee</label>
+                <select
+                  value={currentTask.assignee_id}
+                  onChange={(e) => setCurrentTask({ ...currentTask, assignee_id: e.target.value })}
+                  className="form-input"
+                >
+                  <option value="">Select assignee</option>
+                  {users.filter(u => u.role === 'assignee').map(user => (
+                    <option key={user.id} value={user.id}>{user.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="form-label">Approver</label>
+                <select
+                  value={currentTask.approver_id}
+                  onChange={(e) => setCurrentTask({ ...currentTask, approver_id: e.target.value })}
+                  className="form-input"
+                >
+                  <option value="">Select approver</option>
+                  {users.filter(u => u.role === 'approver').map(user => (
+                    <option key={user.id} value={user.id}>{user.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="form-label">Duration</label>
+                <input
+                  type="text"
+                  value={currentTask.duration}
+                  onChange={(e) => setCurrentTask({ ...currentTask, duration: e.target.value })}
+                  className="form-input"
+                  placeholder="e.g. 2d 3h:30m"
+                />
+              </div>
+            </div>
+
+            <div className="flex space-x-4 mt-6">
+              <button
+                onClick={handleAddTask}
+                className="btn-primary"
+              >
+                Add Task
+              </button>
+              <button
+                onClick={() => setShowTaskModal(false)}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -603,7 +1226,9 @@ const Tasks = () => {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen bg-gray-100">Loading...</div>;
+    return <div className="flex justify-center items-center h-screen bg-gray-100">
+      <div className="loading-spinner"></div>
+    </div>;
   }
 
   return (
@@ -614,7 +1239,7 @@ const Tasks = () => {
             <div className="flex items-center">
               <button
                 onClick={() => window.location.href = '/dashboard'}
-                className="text-blue-600 hover:text-blue-800 mr-4"
+                className="text-primary hover:text-blue-800 mr-4"
               >
                 ← Back to Dashboard
               </button>
@@ -658,12 +1283,12 @@ const Tasks = () => {
                         {task.description}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          task.status === 'approved' ? 'bg-green-100 text-green-800' :
-                          task.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                          task.status === 'submitted' ? 'bg-yellow-100 text-yellow-800' :
-                          task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                          'bg-gray-100 text-gray-800'
+                        <span className={`status-badge ${
+                          task.status === 'approved' ? 'status-approved' :
+                          task.status === 'rejected' ? 'status-rejected' :
+                          task.status === 'submitted' ? 'status-submitted' :
+                          task.status === 'in_progress' ? 'status-in-progress' :
+                          'status-not-started'
                         }`}>
                           {task.status.replace('_', ' ')}
                         </span>
@@ -680,7 +1305,7 @@ const Tasks = () => {
                                 setSelectedTask(task);
                                 setShowSubmissionModal(true);
                               }}
-                              className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition duration-200"
+                              className="btn-primary text-xs"
                             >
                               Submit
                             </button>
@@ -693,7 +1318,7 @@ const Tasks = () => {
                                 setSelectedTask(task);
                                 setShowApprovalModal(true);
                               }}
-                              className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition duration-200"
+                              className="btn-primary text-xs"
                             >
                               Review
                             </button>
@@ -717,17 +1342,15 @@ const Tasks = () => {
 
       {/* Task Submission Modal */}
       {showSubmissionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <div className="modal-overlay">
+          <div className="modal-content">
             <h2 className="text-xl font-semibold mb-4">Submit Task</h2>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Task Submission
-              </label>
+              <label className="form-label">Task Submission</label>
               <textarea
                 value={submissionContent}
                 onChange={(e) => setSubmissionContent(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-input"
                 rows="4"
                 placeholder="Describe your completed work..."
               />
@@ -735,13 +1358,13 @@ const Tasks = () => {
             <div className="flex space-x-4">
               <button
                 onClick={handleTaskSubmit}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+                className="btn-primary"
               >
                 Submit
               </button>
               <button
                 onClick={() => setShowSubmissionModal(false)}
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
+                className="btn-secondary"
               >
                 Cancel
               </button>
@@ -752,21 +1375,19 @@ const Tasks = () => {
 
       {/* Task Approval Modal */}
       {showApprovalModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <div className="modal-overlay">
+          <div className="modal-content">
             <h2 className="text-xl font-semibold mb-4">Review Task</h2>
             <div className="mb-4">
               <h3 className="font-medium text-gray-900">{selectedTask?.title}</h3>
               <p className="text-gray-600 text-sm mt-1">{selectedTask?.description}</p>
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Comments
-              </label>
+              <label className="form-label">Comments</label>
               <textarea
                 value={approvalComments}
                 onChange={(e) => setApprovalComments(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-input"
                 rows="3"
                 placeholder="Add your feedback..."
               />
@@ -774,270 +1395,19 @@ const Tasks = () => {
             <div className="flex space-x-4">
               <button
                 onClick={() => handleTaskApproval('approved')}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200"
+                className="btn-success"
               >
                 Approve
               </button>
               <button
                 onClick={() => handleTaskApproval('rejected')}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200"
+                className="btn-danger"
               >
                 Reject
               </button>
               <button
                 onClick={() => setShowApprovalModal(false)}
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Create Workflow Component
-const CreateWorkflow = () => {
-  const { user } = useAuth();
-  const [workflowName, setWorkflowName] = useState('');
-  const [workflowDescription, setWorkflowDescription] = useState('');
-  const [tasks, setTasks] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [showTaskModal, setShowTaskModal] = useState(false);
-  const [currentTask, setCurrentTask] = useState({
-    title: '',
-    description: '',
-    assignee_id: '',
-    approver_id: '',
-    transitions: []
-  });
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get(`${API}/users`);
-        setUsers(response.data);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    };
-
-    if (user?.role === 'admin') {
-      fetchUsers();
-    }
-  }, [user]);
-
-  const handleCreateWorkflow = async () => {
-    try {
-      // Create workflow
-      const workflowResponse = await axios.post(`${API}/workflows`, {
-        name: workflowName,
-        description: workflowDescription
-      });
-
-      const workflowId = workflowResponse.data.id;
-
-      // Create tasks
-      for (const task of tasks) {
-        await axios.post(`${API}/workflows/${workflowId}/tasks`, task);
-      }
-
-      alert('Workflow created successfully!');
-      window.location.href = '/dashboard';
-    } catch (error) {
-      console.error('Error creating workflow:', error);
-      alert('Error creating workflow');
-    }
-  };
-
-  const handleAddTask = () => {
-    if (currentTask.title && currentTask.assignee_id && currentTask.approver_id) {
-      setTasks([...tasks, { ...currentTask, id: Date.now().toString() }]);
-      setCurrentTask({
-        title: '',
-        description: '',
-        assignee_id: '',
-        approver_id: '',
-        transitions: []
-      });
-      setShowTaskModal(false);
-    }
-  };
-
-  if (user?.role !== 'admin') {
-    return <div className="flex justify-center items-center h-screen bg-gray-100">Unauthorized</div>;
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <button
-                onClick={() => window.location.href = '/dashboard'}
-                className="text-blue-600 hover:text-blue-800 mr-4"
-              >
-                ← Back to Dashboard
-              </button>
-              <h1 className="text-xl font-semibold text-gray-900">Create Workflow</h1>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="bg-white shadow rounded-lg p-6">
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Workflow Name
-                </label>
-                <input
-                  type="text"
-                  value={workflowName}
-                  onChange={(e) => setWorkflowName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter workflow name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
-                <textarea
-                  value={workflowDescription}
-                  onChange={(e) => setWorkflowDescription(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows="3"
-                  placeholder="Describe the workflow"
-                />
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium text-gray-900">Tasks</h3>
-                  <button
-                    onClick={() => setShowTaskModal(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
-                  >
-                    Add Task
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  {tasks.map((task, index) => (
-                    <div key={task.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                      <h4 className="font-medium text-gray-900">{task.title}</h4>
-                      <p className="text-gray-600 text-sm mt-1">{task.description}</p>
-                      <div className="mt-2 text-xs text-gray-500">
-                        Assignee: {users.find(u => u.id === task.assignee_id)?.name || 'Unknown'} |
-                        Approver: {users.find(u => u.id === task.approver_id)?.name || 'Unknown'}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex space-x-4">
-                <button
-                  onClick={handleCreateWorkflow}
-                  disabled={!workflowName || tasks.length === 0}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200 disabled:bg-gray-300"
-                >
-                  Create Workflow
-                </button>
-                <button
-                  onClick={() => window.location.href = '/dashboard'}
-                  className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Add Task Modal */}
-      {showTaskModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">Add Task</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Task Title
-                </label>
-                <input
-                  type="text"
-                  value={currentTask.title}
-                  onChange={(e) => setCurrentTask({ ...currentTask, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter task title"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
-                <textarea
-                  value={currentTask.description}
-                  onChange={(e) => setCurrentTask({ ...currentTask, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows="3"
-                  placeholder="Describe the task"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Assignee
-                </label>
-                <select
-                  value={currentTask.assignee_id}
-                  onChange={(e) => setCurrentTask({ ...currentTask, assignee_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select assignee</option>
-                  {users.filter(u => u.role === 'assignee').map(user => (
-                    <option key={user.id} value={user.id}>{user.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Approver
-                </label>
-                <select
-                  value={currentTask.approver_id}
-                  onChange={(e) => setCurrentTask({ ...currentTask, approver_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select approver</option>
-                  {users.filter(u => u.role === 'approver').map(user => (
-                    <option key={user.id} value={user.id}>{user.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="flex space-x-4 mt-6">
-              <button
-                onClick={handleAddTask}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
-              >
-                Add Task
-              </button>
-              <button
-                onClick={() => setShowTaskModal(false)}
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
+                className="btn-secondary"
               >
                 Cancel
               </button>
@@ -1071,7 +1441,9 @@ const Workflows = () => {
   }, []);
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen bg-gray-100">Loading...</div>;
+    return <div className="flex justify-center items-center h-screen bg-gray-100">
+      <div className="loading-spinner"></div>
+    </div>;
   }
 
   return (
@@ -1082,7 +1454,7 @@ const Workflows = () => {
             <div className="flex items-center">
               <button
                 onClick={() => window.location.href = '/dashboard'}
-                className="text-blue-600 hover:text-blue-800 mr-4"
+                className="text-primary hover:text-blue-800 mr-4"
               >
                 ← Back to Dashboard
               </button>
@@ -1103,12 +1475,12 @@ const Workflows = () => {
                   Created: {new Date(workflow.created_at).toLocaleDateString()}
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    workflow.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                  <span className={`status-badge ${
+                    workflow.is_active ? 'status-approved' : 'status-not-started'
                   }`}>
                     {workflow.is_active ? 'Active' : 'Inactive'}
                   </span>
-                  <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                  <button className="text-primary hover:text-blue-800 text-sm font-medium">
                     View Details
                   </button>
                 </div>
@@ -1129,7 +1501,7 @@ const Unauthorized = () => (
       <p className="text-gray-600 mb-4">You don't have permission to access this page.</p>
       <button
         onClick={() => window.location.href = '/dashboard'}
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+        className="btn-primary"
       >
         Go to Dashboard
       </button>
