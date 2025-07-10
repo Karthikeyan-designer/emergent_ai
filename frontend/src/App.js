@@ -126,11 +126,11 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            {isLogin ? 'Welcome Back' : 'Join Us'}
+            {isLogin ? 'Welcome Back' : 'Join Workflow'}
           </h1>
           <p className="text-gray-600">
             {isLogin ? 'Sign in to your workflow account' : 'Create your workflow account'}
@@ -152,7 +152,7 @@ const Login = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter your name"
               />
             </div>
@@ -165,7 +165,7 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your email"
             />
           </div>
@@ -177,7 +177,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your password"
             />
           </div>
@@ -188,7 +188,7 @@ const Login = () => {
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="assignee">Assignee</option>
                 <option value="approver">Approver</option>
@@ -199,7 +199,7 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200"
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
           >
             {isLogin ? 'Sign In' : 'Create Account'}
           </button>
@@ -208,7 +208,7 @@ const Login = () => {
         <div className="mt-6 text-center">
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="text-indigo-600 hover:text-indigo-800 font-medium"
+            className="text-blue-600 hover:text-blue-800 font-medium"
           >
             {isLogin ? 'Need an account? Sign up' : 'Already have an account? Sign in'}
           </button>
@@ -223,17 +223,20 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const [dashboardData, setDashboardData] = useState(null);
   const [workflows, setWorkflows] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const [dashboardResponse, workflowsResponse] = await Promise.all([
+        const [dashboardResponse, workflowsResponse, tasksResponse] = await Promise.all([
           axios.get(`${API}/dashboard`),
-          axios.get(`${API}/workflows`)
+          axios.get(`${API}/workflows`),
+          axios.get(`${API}/tasks`)
         ]);
         setDashboardData(dashboardResponse.data);
         setWorkflows(workflowsResponse.data);
+        setTasks(tasksResponse.data);
       } catch (error) {
         console.error('Error fetching dashboard:', error);
       } finally {
@@ -244,275 +247,227 @@ const Dashboard = () => {
     fetchDashboard();
   }, []);
 
+  const calculateCompletionRate = () => {
+    if (tasks.length === 0) return 0;
+    const completedTasks = tasks.filter(task => task.status === 'approved').length;
+    return ((completedTasks / tasks.length) * 100).toFixed(2);
+  };
+
+  const getActiveTasks = () => {
+    return tasks.filter(task => task.status === 'in_progress' || task.status === 'submitted' || task.status === 'not_started').length;
+  };
+
   if (loading) {
-    return <div className="flex justify-center items-center h-screen bg-slate-900 text-white">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
-      <nav className="bg-slate-800 shadow-lg border-b border-slate-700">
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-white">Workflow Manager</h1>
+              <div className="flex items-center">
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h1 className="text-xl font-bold text-gray-900">Workflow</h1>
+              </div>
+              <nav className="ml-10 flex space-x-8">
+                <a href="#" className="text-blue-600 font-medium">Home</a>
+                <a href="/workflows" className="text-gray-500 hover:text-gray-700">Workflow</a>
+                <a href="/tasks" className="text-gray-500 hover:text-gray-700">Task</a>
+                <a href="#" className="text-gray-500 hover:text-gray-700">Users</a>
+              </nav>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-slate-300">Welcome, {user?.name}</span>
-              <span className="px-2 py-1 bg-blue-600 text-white text-xs rounded-full capitalize">
-                {user?.role}
-              </span>
-              <button
-                onClick={logout}
-                className="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Logout
+              <button className="p-2 text-gray-400 hover:text-gray-500">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5-5v5zm-3-5V7a4 4 0 118 0v5m-8 0h8m-8 0a2 2 0 012 2v6a2 2 0 01-2 2H7a2 2 0 01-2-2v-6a2 2 0 012-2z" />
+                </svg>
               </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <h2 className="text-2xl font-bold text-white mb-6">Dashboard</h2>
-          
-          {dashboardData && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {dashboardData.role === 'admin' && (
-                <>
-                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
-                    <div className="p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold">W</span>
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <h3 className="text-lg font-medium text-white">Total Workflows</h3>
-                          <p className="text-3xl font-bold text-blue-400">{dashboardData.total_workflows}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
-                    <div className="p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold">T</span>
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <h3 className="text-lg font-medium text-white">Total Tasks</h3>
-                          <p className="text-3xl font-bold text-blue-400">{dashboardData.total_tasks}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
-                    <div className="p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold">P</span>
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <h3 className="text-lg font-medium text-white">Pending Approvals</h3>
-                          <p className="text-3xl font-bold text-blue-400">{dashboardData.pending_approvals}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-              
-              {dashboardData.role === 'assignee' && (
-                <>
-                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
-                    <div className="p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold">M</span>
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <h3 className="text-lg font-medium text-white">My Tasks</h3>
-                          <p className="text-3xl font-bold text-blue-400">{dashboardData.my_tasks}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
-                    <div className="p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold">C</span>
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <h3 className="text-lg font-medium text-white">Completed Tasks</h3>
-                          <p className="text-3xl font-bold text-blue-400">{dashboardData.completed_tasks}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
-                    <div className="p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold">P</span>
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <h3 className="text-lg font-medium text-white">Pending Tasks</h3>
-                          <p className="text-3xl font-bold text-blue-400">{dashboardData.pending_tasks}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-              
-              {dashboardData.role === 'approver' && (
-                <>
-                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
-                    <div className="p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold">P</span>
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <h3 className="text-lg font-medium text-white">Pending Approvals</h3>
-                          <p className="text-3xl font-bold text-blue-400">{dashboardData.pending_approvals}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
-                    <div className="p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold">A</span>
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <h3 className="text-lg font-medium text-white">Approved Tasks</h3>
-                          <p className="text-3xl font-bold text-blue-400">{dashboardData.approved_tasks}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-slate-800 overflow-hidden shadow-lg rounded-lg border border-slate-700">
-                    <div className="p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold">R</span>
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <h3 className="text-lg font-medium text-white">Rejected Tasks</h3>
-                          <p className="text-3xl font-bold text-blue-400">{dashboardData.rejected_tasks}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Workflows Section */}
-          <div className="mb-8">
-            <h3 className="text-xl font-bold text-white mb-4">Workflows</h3>
-            <div className="bg-slate-800 shadow-lg rounded-lg border border-slate-700">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-700">
-                  <thead className="bg-slate-700">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                        Name
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                        Description
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                        Created At
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-slate-800 divide-y divide-slate-700">
-                    {workflows.length > 0 ? workflows.map((workflow) => (
-                      <tr key={workflow.id} className="hover:bg-slate-700">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
-                          {workflow.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
-                          {workflow.description}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
-                          {new Date(workflow.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-600 text-white">
-                            {workflow.is_active ? 'Active' : 'Inactive'}
-                          </span>
-                        </td>
-                      </tr>
-                    )) : (
-                      <tr>
-                        <td colSpan="4" className="px-6 py-4 text-center text-sm text-slate-400">
-                          No workflows created yet
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-700 font-medium">{user?.name || 'User'}</span>
+                <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-medium text-gray-700">{user?.name?.charAt(0) || 'U'}</span>
+                </div>
+                <button
+                  onClick={logout}
+                  className="text-sm text-gray-500 hover:text-gray-700"
+                >
+                  Logout
+                </button>
               </div>
             </div>
           </div>
-          
-          <div className="mt-8 flex space-x-4">
-            <button
-              onClick={() => window.location.href = '/workflows'}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
-            >
-              View Workflows
-            </button>
-            <button
-              onClick={() => window.location.href = '/tasks'}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
-            >
-              View Tasks
-            </button>
-            {user?.role === 'admin' && (
-              <button
-                onClick={() => window.location.href = '/create-workflow'}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
-              >
-                Create Workflow
-              </button>
-            )}
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-8 mb-8 text-white">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-3xl font-bold mb-2">Hello, {user?.name || 'User'}!</h2>
+              <p className="text-blue-100 text-lg">Let's see, what's happening with your workflows.</p>
+            </div>
+            <div className="w-80">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search here"
+                  className="w-full px-4 py-2 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50"
+                />
+                <svg className="absolute right-3 top-2.5 w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-sm text-gray-600">Workflows</p>
+                <p className="text-3xl font-bold text-gray-900">{workflows.length}</p>
+              </div>
+              <button className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white hover:bg-green-600 transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+            </div>
+            <p className="text-sm text-green-600 font-medium">Create</p>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-sm text-gray-600">Active tasks</p>
+                <p className="text-3xl font-bold text-gray-900">{getActiveTasks()}</p>
+              </div>
+              <button className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white hover:bg-blue-600 transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+            </div>
+            <p className="text-sm text-blue-600 font-medium">Add</p>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-sm">
+            <div className="mb-4">
+              <p className="text-sm text-gray-600">Completion Rate</p>
+              <p className="text-3xl font-bold text-gray-900">{calculateCompletionRate()}%</p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-sm">
+            <div className="flex items-center mb-2">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span className="text-2xl font-bold text-gray-900">34%</span>
+            </div>
+            <p className="text-sm text-gray-600">New task</p>
+            <p className="text-sm text-gray-600">Completed in last week</p>
+          </div>
+        </div>
+
+        {/* Recent Workflows */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold text-gray-900">Recent Workflows</h3>
+            <button className="text-blue-600 hover:text-blue-800 font-medium">View all</button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {workflows.slice(0, 2).map((workflow, index) => (
+              <div key={workflow.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900 mb-1">{workflow.name}</h4>
+                    <p className="text-sm text-gray-500 mb-2">{new Date(workflow.created_at).toLocaleDateString()}</p>
+                    <p className="text-sm text-gray-600 mb-3">{workflow.description}</p>
+                    
+                    <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
+                      <span>📅 Deadline: {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}</span>
+                    </div>
+
+                    <div className="mb-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium text-gray-700">Progress</span>
+                        <span className="text-sm font-medium text-gray-700">{index === 0 ? '60%' : 'Not started'}</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full ${index === 0 ? 'bg-blue-600' : 'bg-gray-300'}`}
+                          style={{ width: index === 0 ? '60%' : '0%' }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex -space-x-2">
+                        {[1, 2, 3, 4].map((i) => (
+                          <div key={i} className="w-8 h-8 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full border-2 border-white flex items-center justify-center">
+                            <span className="text-xs font-medium text-white">{String.fromCharCode(65 + i)}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <span className="text-sm font-medium text-gray-700">{index === 0 ? '8' : '10'} Task</span>
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      index === 0 ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      {index === 0 ? 'In Progress' : 'Planning'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="flex space-x-4">
+          <button
+            onClick={() => window.location.href = '/workflows'}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200 font-medium"
+          >
+            View All Workflows
+          </button>
+          <button
+            onClick={() => window.location.href = '/tasks'}
+            className="bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-gray-50 transition duration-200 font-medium border border-blue-600"
+          >
+            View Tasks
+          </button>
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => window.location.href = '/create-workflow'}
+              className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-200 font-medium"
+            >
+              Create Workflow
+            </button>
+          )}
+        </div>
+      </main>
     </div>
   );
 };
@@ -575,58 +530,58 @@ const Tasks = () => {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen bg-slate-900 text-white">Loading...</div>;
+    return <div className="flex justify-center items-center h-screen bg-gray-100">Loading...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
-      <nav className="bg-slate-800 shadow-lg border-b border-slate-700">
+    <div className="min-h-screen bg-gray-100">
+      <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <button
                 onClick={() => window.location.href = '/dashboard'}
-                className="text-blue-400 hover:text-blue-300 mr-4"
+                className="text-blue-600 hover:text-blue-800 mr-4"
               >
                 ← Back to Dashboard
               </button>
-              <h1 className="text-xl font-semibold text-white">Tasks</h1>
+              <h1 className="text-xl font-semibold text-gray-900">Tasks</h1>
             </div>
           </div>
         </div>
-      </nav>
+      </header>
 
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="bg-slate-800 shadow-lg rounded-lg border border-slate-700">
+          <div className="bg-white shadow rounded-lg">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-700">
-                <thead className="bg-slate-700">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Task Title
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Description
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Deadline
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-slate-800 divide-y divide-slate-700">
+                <tbody className="bg-white divide-y divide-gray-200">
                   {tasks.length > 0 ? tasks.map((task) => (
-                    <tr key={task.id} className="hover:bg-slate-700">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                    <tr key={task.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {task.title}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-300 max-w-xs truncate">
+                      <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
                         {task.description}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -640,7 +595,7 @@ const Tasks = () => {
                           {task.status.replace('_', ' ')}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {task.deadline ? new Date(task.deadline).toLocaleDateString() : 'No deadline'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -675,7 +630,7 @@ const Tasks = () => {
                     </tr>
                   )) : (
                     <tr>
-                      <td colSpan="5" className="px-6 py-4 text-center text-sm text-slate-400">
+                      <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
                         No tasks found
                       </td>
                     </tr>
@@ -690,16 +645,16 @@ const Tasks = () => {
       {/* Task Submission Modal */}
       {showSubmissionModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-slate-800 rounded-lg p-6 w-full max-w-md border border-slate-700">
-            <h2 className="text-xl font-semibold mb-4 text-white">Submit Task</h2>
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-xl font-semibold mb-4">Submit Task</h2>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-slate-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Task Submission
               </label>
               <textarea
                 value={submissionContent}
                 onChange={(e) => setSubmissionContent(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows="4"
                 placeholder="Describe your completed work..."
               />
@@ -713,7 +668,7 @@ const Tasks = () => {
               </button>
               <button
                 onClick={() => setShowSubmissionModal(false)}
-                className="bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-500 transition duration-200"
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
               >
                 Cancel
               </button>
@@ -725,20 +680,20 @@ const Tasks = () => {
       {/* Task Approval Modal */}
       {showApprovalModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-slate-800 rounded-lg p-6 w-full max-w-md border border-slate-700">
-            <h2 className="text-xl font-semibold mb-4 text-white">Review Task</h2>
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-xl font-semibold mb-4">Review Task</h2>
             <div className="mb-4">
-              <h3 className="font-medium text-white">{selectedTask?.title}</h3>
-              <p className="text-slate-300 text-sm mt-1">{selectedTask?.description}</p>
+              <h3 className="font-medium text-gray-900">{selectedTask?.title}</h3>
+              <p className="text-gray-600 text-sm mt-1">{selectedTask?.description}</p>
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-slate-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Comments
               </label>
               <textarea
                 value={approvalComments}
                 onChange={(e) => setApprovalComments(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows="3"
                 placeholder="Add your feedback..."
               />
@@ -758,7 +713,7 @@ const Tasks = () => {
               </button>
               <button
                 onClick={() => setShowApprovalModal(false)}
-                className="bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-500 transition duration-200"
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
               >
                 Cancel
               </button>
@@ -839,52 +794,52 @@ const CreateWorkflow = () => {
   };
 
   if (user?.role !== 'admin') {
-    return <div className="flex justify-center items-center h-screen bg-slate-900 text-white">Unauthorized</div>;
+    return <div className="flex justify-center items-center h-screen bg-gray-100">Unauthorized</div>;
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
-      <nav className="bg-slate-800 shadow-lg border-b border-slate-700">
+    <div className="min-h-screen bg-gray-100">
+      <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <button
                 onClick={() => window.location.href = '/dashboard'}
-                className="text-blue-400 hover:text-blue-300 mr-4"
+                className="text-blue-600 hover:text-blue-800 mr-4"
               >
                 ← Back to Dashboard
               </button>
-              <h1 className="text-xl font-semibold text-white">Create Workflow</h1>
+              <h1 className="text-xl font-semibold text-gray-900">Create Workflow</h1>
             </div>
           </div>
         </div>
-      </nav>
+      </header>
 
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="bg-slate-800 shadow-lg rounded-lg p-6 border border-slate-700">
+          <div className="bg-white shadow rounded-lg p-6">
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Workflow Name
                 </label>
                 <input
                   type="text"
                   value={workflowName}
                   onChange={(e) => setWorkflowName(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter workflow name"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Description
                 </label>
                 <textarea
                   value={workflowDescription}
                   onChange={(e) => setWorkflowDescription(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows="3"
                   placeholder="Describe the workflow"
                 />
@@ -892,7 +847,7 @@ const CreateWorkflow = () => {
 
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium text-white">Tasks</h3>
+                  <h3 className="text-lg font-medium text-gray-900">Tasks</h3>
                   <button
                     onClick={() => setShowTaskModal(true)}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
@@ -903,10 +858,10 @@ const CreateWorkflow = () => {
 
                 <div className="space-y-4">
                   {tasks.map((task, index) => (
-                    <div key={task.id} className="border border-slate-600 rounded-lg p-4 bg-slate-700">
-                      <h4 className="font-medium text-white">{task.title}</h4>
-                      <p className="text-slate-300 text-sm mt-1">{task.description}</p>
-                      <div className="mt-2 text-xs text-slate-400">
+                    <div key={task.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                      <h4 className="font-medium text-gray-900">{task.title}</h4>
+                      <p className="text-gray-600 text-sm mt-1">{task.description}</p>
+                      <div className="mt-2 text-xs text-gray-500">
                         Assignee: {users.find(u => u.id === task.assignee_id)?.name || 'Unknown'} |
                         Approver: {users.find(u => u.id === task.approver_id)?.name || 'Unknown'}
                       </div>
@@ -919,13 +874,13 @@ const CreateWorkflow = () => {
                 <button
                   onClick={handleCreateWorkflow}
                   disabled={!workflowName || tasks.length === 0}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200 disabled:bg-slate-600"
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200 disabled:bg-gray-300"
                 >
                   Create Workflow
                 </button>
                 <button
                   onClick={() => window.location.href = '/dashboard'}
-                  className="bg-slate-600 text-white px-6 py-2 rounded-lg hover:bg-slate-500 transition duration-200"
+                  className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
                 >
                   Cancel
                 </button>
@@ -938,43 +893,43 @@ const CreateWorkflow = () => {
       {/* Add Task Modal */}
       {showTaskModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-slate-800 rounded-lg p-6 w-full max-w-md border border-slate-700">
-            <h2 className="text-xl font-semibold mb-4 text-white">Add Task</h2>
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-xl font-semibold mb-4">Add Task</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Task Title
                 </label>
                 <input
                   type="text"
                   value={currentTask.title}
                   onChange={(e) => setCurrentTask({ ...currentTask, title: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter task title"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Description
                 </label>
                 <textarea
                   value={currentTask.description}
                   onChange={(e) => setCurrentTask({ ...currentTask, description: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows="3"
                   placeholder="Describe the task"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Assignee
                 </label>
                 <select
                   value={currentTask.assignee_id}
                   onChange={(e) => setCurrentTask({ ...currentTask, assignee_id: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select assignee</option>
                   {users.filter(u => u.role === 'assignee').map(user => (
@@ -984,13 +939,13 @@ const CreateWorkflow = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Approver
                 </label>
                 <select
                   value={currentTask.approver_id}
                   onChange={(e) => setCurrentTask({ ...currentTask, approver_id: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select approver</option>
                   {users.filter(u => u.role === 'approver').map(user => (
@@ -1009,7 +964,7 @@ const CreateWorkflow = () => {
               </button>
               <button
                 onClick={() => setShowTaskModal(false)}
-                className="bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-500 transition duration-200"
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
               >
                 Cancel
               </button>
@@ -1021,15 +976,87 @@ const CreateWorkflow = () => {
   );
 };
 
+// Workflows Component
+const Workflows = () => {
+  const { user } = useAuth();
+  const [workflows, setWorkflows] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchWorkflows = async () => {
+      try {
+        const response = await axios.get(`${API}/workflows`);
+        setWorkflows(response.data);
+      } catch (error) {
+        console.error('Error fetching workflows:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorkflows();
+  }, []);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen bg-gray-100">Loading...</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <button
+                onClick={() => window.location.href = '/dashboard'}
+                className="text-blue-600 hover:text-blue-800 mr-4"
+              >
+                ← Back to Dashboard
+              </button>
+              <h1 className="text-xl font-semibold text-gray-900">Workflows</h1>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {workflows.map((workflow) => (
+              <div key={workflow.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{workflow.name}</h3>
+                <p className="text-gray-600 text-sm mb-4">{workflow.description}</p>
+                <div className="text-xs text-gray-500 mb-4">
+                  Created: {new Date(workflow.created_at).toLocaleDateString()}
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    workflow.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {workflow.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                  <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                    View Details
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Unauthorized Component
 const Unauthorized = () => (
-  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+  <div className="min-h-screen bg-gray-100 flex items-center justify-center">
     <div className="text-center">
       <h1 className="text-2xl font-bold text-gray-900 mb-4">Unauthorized</h1>
       <p className="text-gray-600 mb-4">You don't have permission to access this page.</p>
       <button
         onClick={() => window.location.href = '/dashboard'}
-        className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200"
+        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
       >
         Go to Dashboard
       </button>
@@ -1054,6 +1081,11 @@ function App() {
             <Route path="/tasks" element={
               <ProtectedRoute>
                 <Tasks />
+              </ProtectedRoute>
+            } />
+            <Route path="/workflows" element={
+              <ProtectedRoute>
+                <Workflows />
               </ProtectedRoute>
             } />
             <Route path="/create-workflow" element={

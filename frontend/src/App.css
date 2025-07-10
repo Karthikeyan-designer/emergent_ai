@@ -40,14 +40,67 @@
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Custom component styles */
+/* Gradient backgrounds */
+.bg-gradient-workflow {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bg-gradient-blue {
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+}
+
+/* Card hover effects */
 .card-hover {
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition: all 0.3s ease;
 }
 
 .card-hover:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.btn-secondary {
+  @apply bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+}
+
+.btn-success {
+  @apply bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
+}
+
+/* Form styles */
+.form-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-2;
+}
+
+/* Modal styles */
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg p-6 w-full max-w-md mx-4 max-h-96 overflow-y-auto;
+}
+
+/* Navigation styles */
+.nav-link {
+  @apply text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-200;
+}
+
+.nav-link-active {
+  @apply text-blue-600 font-medium px-3 py-2 rounded-md text-sm;
 }
 
 /* Status badges */
@@ -75,165 +128,256 @@
   @apply bg-red-100 text-red-800;
 }
 
-/* Button variations */
-.btn-primary {
-  @apply bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
+/* Workflow card styles */
+.workflow-card {
+  @apply bg-white rounded-xl p-6 shadow-sm border border-gray-200 card-hover;
 }
 
-.btn-secondary {
-  @apply bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+.workflow-card-header {
+  @apply flex items-start justify-between mb-4;
 }
 
-.btn-success {
-  @apply bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+.workflow-card-title {
+  @apply font-semibold text-gray-900 mb-1;
 }
 
-.btn-danger {
-  @apply bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
+.workflow-card-meta {
+  @apply text-sm text-gray-500 mb-2;
 }
 
-/* Form styles */
-.form-input {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent;
+.workflow-card-description {
+  @apply text-sm text-gray-600 mb-3;
 }
 
-.form-label {
-  @apply block text-sm font-medium text-gray-700 mb-2;
+.workflow-card-deadline {
+  @apply flex items-center space-x-4 text-sm text-gray-500 mb-4;
 }
 
-/* Modal styles */
-.modal-overlay {
-  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+.workflow-card-progress {
+  @apply mb-4;
 }
 
-.modal-content {
-  @apply bg-white rounded-lg p-6 w-full max-w-md mx-4 max-h-96 overflow-y-auto;
+.workflow-card-progress-bar {
+  @apply w-full bg-gray-200 rounded-full h-2;
 }
 
-/* Navigation styles */
-.nav-link {
-  @apply text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition duration-200;
+.workflow-card-progress-fill {
+  @apply h-2 rounded-full bg-blue-600;
 }
 
-.nav-link-active {
-  @apply bg-indigo-100 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium;
+.workflow-card-footer {
+  @apply flex items-center justify-between;
 }
 
-/* Dashboard card styles */
-.dashboard-card {
-  @apply bg-white overflow-hidden shadow-lg rounded-lg card-hover;
+.workflow-card-avatars {
+  @apply flex -space-x-2;
 }
 
-.dashboard-card-content {
-  @apply p-6;
+.workflow-card-avatar {
+  @apply w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-xs font-medium text-white;
 }
 
-.dashboard-card-icon {
-  @apply w-8 h-8 rounded-full flex items-center justify-center text-white font-bold;
+.workflow-card-task-count {
+  @apply text-sm font-medium text-gray-700;
 }
 
-/* Task card styles */
-.task-card {
-  @apply bg-white shadow-lg rounded-lg p-6 card-hover;
+.workflow-card-status {
+  @apply px-3 py-1 rounded-full text-xs font-medium;
 }
 
-.task-header {
-  @apply flex justify-between items-start mb-4;
+/* Dashboard specific styles */
+.dashboard-hero {
+  @apply bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-8 mb-8 text-white;
 }
 
-.task-title {
-  @apply text-lg font-semibold text-gray-900;
+.dashboard-hero-content {
+  @apply flex justify-between items-center;
 }
 
-.task-description {
-  @apply text-gray-600 mt-1;
+.dashboard-hero-title {
+  @apply text-3xl font-bold mb-2;
 }
 
-.task-actions {
-  @apply flex space-x-4 mt-4;
+.dashboard-hero-subtitle {
+  @apply text-blue-100 text-lg;
 }
 
-/* Workflow styles */
-.workflow-header {
-  @apply bg-white shadow-sm border-b;
+.dashboard-search {
+  @apply w-80;
 }
 
-.workflow-nav {
-  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+.dashboard-search-input {
+  @apply w-full px-4 py-2 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50;
 }
 
-.workflow-nav-content {
-  @apply flex justify-between items-center h-16;
+.dashboard-stats {
+  @apply grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8;
 }
 
-.workflow-title {
-  @apply text-xl font-semibold text-gray-900;
+.dashboard-stat-card {
+  @apply bg-white rounded-xl p-6 shadow-sm;
 }
 
-.workflow-main {
-  @apply max-w-7xl mx-auto py-6 sm:px-6 lg:px-8;
+.dashboard-stat-header {
+  @apply flex items-center justify-between mb-4;
 }
 
-.workflow-content {
-  @apply px-4 py-6 sm:px-0;
+.dashboard-stat-value {
+  @apply text-3xl font-bold text-gray-900;
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-  .dashboard-card-content {
-    @apply p-4;
-  }
-  
-  .task-card {
-    @apply p-4;
-  }
-  
-  .modal-content {
-    @apply max-w-sm;
-  }
+.dashboard-stat-label {
+  @apply text-sm text-gray-600;
 }
 
-/* Dark mode support (if needed) */
-@media (prefers-color-scheme: dark) {
-  .dark-mode {
-    @apply bg-gray-900 text-white;
-  }
-  
-  .dark-mode .card-hover {
-    @apply bg-gray-800 text-white;
-  }
-  
-  .dark-mode .form-input {
-    @apply bg-gray-800 border-gray-700 text-white;
-  }
+.dashboard-stat-action {
+  @apply w-10 h-10 rounded-full flex items-center justify-center text-white transition-colors;
+}
+
+.dashboard-stat-action-text {
+  @apply text-sm font-medium;
+}
+
+/* Recent workflows section */
+.recent-workflows {
+  @apply mb-8;
+}
+
+.recent-workflows-header {
+  @apply flex justify-between items-center mb-6;
+}
+
+.recent-workflows-title {
+  @apply text-xl font-bold text-gray-900;
+}
+
+.recent-workflows-view-all {
+  @apply text-blue-600 hover:text-blue-800 font-medium;
+}
+
+.recent-workflows-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+/* Table styles */
+.table-container {
+  @apply bg-white shadow rounded-lg overflow-hidden;
+}
+
+.table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+.table-header {
+  @apply bg-gray-50;
+}
+
+.table-header-cell {
+  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+
+.table-body {
+  @apply bg-white divide-y divide-gray-200;
+}
+
+.table-row {
+  @apply hover:bg-gray-50;
+}
+
+.table-cell {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
 }
 
 /* Loading states */
 .loading-spinner {
-  @apply animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600;
+  @apply animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600;
 }
 
 .loading-skeleton {
   @apply animate-pulse bg-gray-300 rounded;
 }
 
-/* Notification styles */
-.notification {
-  @apply fixed top-4 right-4 max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg z-50;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-hero-content {
+    @apply flex-col space-y-4;
+  }
+  
+  .dashboard-search {
+    @apply w-full;
+  }
+  
+  .dashboard-stats {
+    @apply grid-cols-1 md:grid-cols-2;
+  }
+  
+  .recent-workflows-grid {
+    @apply grid-cols-1;
+  }
 }
 
-.notification-success {
-  @apply bg-green-50 border-green-200;
+/* Custom focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
 }
 
-.notification-error {
-  @apply bg-red-50 border-red-200;
+/* Transition utilities */
+.transition-all {
+  @apply transition-all duration-200 ease-in-out;
 }
 
-.notification-info {
-  @apply bg-blue-50 border-blue-200;
+/* Shadow utilities */
+.shadow-card {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
-.notification-warning {
-  @apply bg-yellow-50 border-yellow-200;
+.shadow-card-hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Border radius utilities */
+.rounded-card {
+  @apply rounded-xl;
+}
+
+/* Text utilities */
+.text-primary {
+  @apply text-blue-600;
+}
+
+.text-secondary {
+  @apply text-gray-600;
+}
+
+.text-success {
+  @apply text-green-600;
+}
+
+.text-danger {
+  @apply text-red-600;
+}
+
+.text-warning {
+  @apply text-yellow-600;
+}
+
+/* Background utilities */
+.bg-primary {
+  @apply bg-blue-600;
+}
+
+.bg-secondary {
+  @apply bg-gray-600;
+}
+
+.bg-success {
+  @apply bg-green-600;
+}
+
+.bg-danger {
+  @apply bg-red-600;
+}
+
+.bg-warning {
+  @apply bg-yellow-600;
 }
