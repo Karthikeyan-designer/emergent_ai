@@ -329,6 +329,22 @@ async def create_task(workflow_id: str, task_data: TaskCreate, current_user: Use
     await db.tasks.insert_one(task.dict())
     return task
 
+@api_router.put("/tasks/{task_id}")
+async def update_task(task_id: str, transitions: List[TaskTransition], current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Only admins can update tasks")
+    
+    task = await db.tasks.find_one({"id": task_id})
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    await db.tasks.update_one(
+        {"id": task_id},
+        {"$set": {"transitions": [t.dict() for t in transitions], "updated_at": datetime.utcnow()}}
+    )
+    
+    return {"message": "Task updated successfully"}
+
 @api_router.get("/tasks", response_model=List[Task])
 async def get_user_tasks(current_user: User = Depends(get_current_user)):
     if current_user.role == UserRole.ADMIN:
