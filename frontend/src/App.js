@@ -566,6 +566,7 @@ const CreateWorkflow = () => {
     approver_id: '',
     duration: '2d 3h:30m'
   });
+  const [editingTaskId, setEditingTaskId] = useState(null);
   const [currentTransition, setCurrentTransition] = useState({
     sourceTask: '',
     condition: 'Approved',
@@ -601,13 +602,24 @@ const CreateWorkflow = () => {
 
   const handleAddTask = () => {
     if (currentTask.title && currentTask.assignee_id && currentTask.approver_id) {
-      const newTask = {
-        ...currentTask,
-        id: Date.now().toString(),
-        number: tasks.length + 1,
-        tempId: `task_${Date.now()}`
-      };
-      setTasks([...tasks, newTask]);
+      if (editingTaskId) {
+        // Update existing task
+        setTasks(tasks.map(task => 
+          task.id === editingTaskId 
+            ? { ...currentTask, id: editingTaskId, number: task.number }
+            : task
+        ));
+        setEditingTaskId(null);
+      } else {
+        // Add new task
+        const newTask = {
+          ...currentTask,
+          id: Date.now().toString(),
+          number: tasks.length + 1
+        };
+        setTasks([...tasks, newTask]);
+      }
+      
       setCurrentTask({
         title: '',
         description: '',
@@ -619,19 +631,16 @@ const CreateWorkflow = () => {
     }
   };
 
-  const handleAddTransition = () => {
-    if (currentTransition.sourceTask && currentTransition.targetTasks.length > 0) {
-      const newTransition = {
-        ...currentTransition,
-        id: Date.now().toString()
-      };
-      setTransitions([...transitions, newTransition]);
-      setCurrentTransition({
-        sourceTask: '',
-        condition: 'Approved',
-        targetTasks: []
-      });
-    }
+  const handleEditTask = (task) => {
+    setCurrentTask({
+      title: task.title,
+      description: task.description,
+      assignee_id: task.assignee_id,
+      approver_id: task.approver_id,
+      duration: task.duration
+    });
+    setEditingTaskId(task.id);
+    setShowTaskModal(true);
   };
 
   const handleRemoveTask = (taskId) => {
@@ -652,6 +661,21 @@ const CreateWorkflow = () => {
           !transition.targetTasks.includes(taskToRemove.title)
       );
       setTransitions(updatedTransitions);
+    }
+  };
+
+  const handleAddTransition = () => {
+    if (currentTransition.sourceTask && currentTransition.targetTasks.length > 0) {
+      const newTransition = {
+        ...currentTransition,
+        id: Date.now().toString()
+      };
+      setTransitions([...transitions, newTransition]);
+      setCurrentTransition({
+        sourceTask: '',
+        condition: 'Approved',
+        targetTasks: []
+      });
     }
   };
 
@@ -739,6 +763,18 @@ const CreateWorkflow = () => {
       .map(task => task.title);
   };
 
+  const closeModal = () => {
+    setShowTaskModal(false);
+    setEditingTaskId(null);
+    setCurrentTask({
+      title: '',
+      description: '',
+      assignee_id: '',
+      approver_id: '',
+      duration: '2d 3h:30m'
+    });
+  };
+
   if (user?.role !== 'admin') {
     return <div className="flex justify-center items-center h-screen bg-gray-100">Unauthorized</div>;
   }
@@ -804,41 +840,84 @@ const CreateWorkflow = () => {
       <main className="max-w-7xl mx-auto px-6 py-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-8">New Workflow</h1>
 
-        {/* Step Indicator */}
-        <div className="step-indicator mb-8">
-          <div className={`step ${currentStep >= 1 ? (currentStep === 1 ? 'step-active' : 'step-completed') : 'step-inactive'}`}>
-            <div className="step-number">
-              {currentStep > 1 ? '✓' : '1'}
+        {/* Step Progress Bar */}
+        <div className="bg-white rounded-xl p-6 mb-8 border border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-8 w-full">
+              {/* Step 1 */}
+              <div className="flex items-center flex-1">
+                <div className={`flex items-center justify-center w-6 h-6 rounded-full text-sm font-medium ${
+                  currentStep >= 1 ? 'bg-primary text-white' : 'bg-gray-300 text-gray-600'
+                }`}>
+                  {currentStep > 1 ? '✓' : '1'}
+                </div>
+                <span className={`ml-3 text-sm font-medium ${
+                  currentStep === 1 ? 'text-primary' : currentStep > 1 ? 'text-green-600' : 'text-gray-500'
+                }`}>
+                  Flow Information
+                </span>
+                <div className={`flex-1 h-1 ml-8 ${
+                  currentStep > 1 ? 'bg-primary' : 'bg-gray-300'
+                }`}></div>
+              </div>
+
+              {/* Step 2 */}
+              <div className="flex items-center flex-1">
+                <div className={`flex items-center justify-center w-6 h-6 rounded-full text-sm font-medium ${
+                  currentStep >= 2 ? 'bg-primary text-white' : 'bg-gray-300 text-gray-600'
+                }`}>
+                  {currentStep > 2 ? '✓' : '2'}
+                </div>
+                <span className={`ml-3 text-sm font-medium ${
+                  currentStep === 2 ? 'text-primary' : currentStep > 2 ? 'text-green-600' : 'text-gray-500'
+                }`}>
+                  Task Creation
+                </span>
+                <div className={`flex-1 h-1 ml-8 ${
+                  currentStep > 2 ? 'bg-primary' : 'bg-gray-300'
+                }`}></div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="flex items-center">
+                <div className={`flex items-center justify-center w-6 h-6 rounded-full text-sm font-medium ${
+                  currentStep >= 3 ? 'bg-primary text-white' : 'bg-gray-300 text-gray-600'
+                }`}>
+                  3
+                </div>
+                <span className={`ml-3 text-sm font-medium ${
+                  currentStep === 3 ? 'text-primary' : 'text-gray-500'
+                }`}>
+                  Transition
+                </span>
+              </div>
             </div>
-            <div className="step-label">Flow Information</div>
-          </div>
-          <div className={`step-line ${currentStep > 1 ? 'step-line-completed' : 'step-line-inactive'}`}></div>
-          
-          <div className={`step ${currentStep >= 2 ? (currentStep === 2 ? 'step-active' : 'step-completed') : 'step-inactive'}`}>
-            <div className="step-number">
-              {currentStep > 2 ? '✓' : '2'}
-            </div>
-            <div className="step-label">Task Creation</div>
-          </div>
-          <div className={`step-line ${currentStep > 2 ? 'step-line-completed' : 'step-line-inactive'}`}></div>
-          
-          <div className={`step ${currentStep >= 3 ? 'step-active' : 'step-inactive'}`}>
-            <div className="step-number">3</div>
-            <div className="step-label">Transition</div>
           </div>
         </div>
 
         {/* Step Content */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          {/* Step 1: Flow Information */}
           {currentStep === 1 && (
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Flow Information</h2>
+              <div className="flex items-center mb-6">
+                <button
+                  onClick={handleBack}
+                  className="text-gray-500 hover:text-gray-700 mr-4"
+                  disabled={currentStep === 1}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <h2 className="text-xl font-semibold text-gray-900">Flow Information</h2>
+              </div>
               
               <div className="space-y-6">
                 <div>
                   <label className="form-label">
                     Workflow name
-                    <span className="text-gray-400 ml-2">Choose a clear, descriptive name for your workflow</span>
+                    <span className="text-gray-400 ml-auto text-right float-right">Choose a clear, descriptive name for your workflow</span>
                   </label>
                   <input
                     type="text"
@@ -862,7 +941,7 @@ const CreateWorkflow = () => {
 
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="form-label">Category</label>
+                    <label className="form-label text-orange-500">● Category</label>
                     <select
                       value={workflowData.category}
                       onChange={(e) => setWorkflowData({ ...workflowData, category: e.target.value })}
@@ -876,7 +955,7 @@ const CreateWorkflow = () => {
                   </div>
 
                   <div>
-                    <label className="form-label">Priority</label>
+                    <label className="form-label text-orange-500">● Priority</label>
                     <select
                       value={workflowData.priority}
                       onChange={(e) => setWorkflowData({ ...workflowData, priority: e.target.value })}
@@ -908,115 +987,137 @@ const CreateWorkflow = () => {
             </div>
           )}
 
+          {/* Step 2: Task Creation */}
           {currentStep === 2 && (
             <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Task Creation</h2>
+              <div className="flex items-center mb-6">
                 <button
-                  onClick={() => setShowTaskModal(true)}
-                  className="btn-primary flex items-center"
+                  onClick={handleBack}
+                  className="text-gray-500 hover:text-gray-700 mr-4"
                 >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  Add Task
                 </button>
+                <h2 className="text-xl font-semibold text-gray-900">Task Creation</h2>
               </div>
 
               {tasks.length === 0 ? (
-                <div className="text-center py-16">
-                  <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
+                <div className="text-center py-20">
+                  <button
+                    onClick={() => setShowTaskModal(true)}
+                    className="btn-primary flex items-center mx-auto mb-4"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Task
+                  </button>
                   <p className="text-gray-500">Create tasks to start building your workflow</p>
                 </div>
               ) : (
                 <div>
-                  <div className="flex items-center mb-4">
-                    <div className="task-number">{tasks.length}</div>
-                    <h3 className="text-lg font-semibold text-gray-900 ml-3">Created Tasks</h3>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold mr-3">
+                        {tasks.length}
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900">Created Tasks</h3>
+                    </div>
+                    <button
+                      onClick={() => setShowTaskModal(true)}
+                      className="btn-primary flex items-center"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Add Task
+                    </button>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-4 mb-6">
                     {tasks.map((task, index) => (
-                      <div key={task.id} className="task-card">
-                        <div className="task-header">
-                          <div className="task-number">{task.number}</div>
-                          <h4 className="task-title">{task.title}</h4>
-                          <div className="ml-auto flex items-center space-x-2">
-                            <button
-                              onClick={() => {
-                                setCurrentTask({
-                                  title: task.title,
-                                  description: task.description,
-                                  assignee_id: task.assignee_id,
-                                  approver_id: task.approver_id,
-                                  duration: task.duration
-                                });
-                                setShowTaskModal(true);
-                              }}
-                              className="text-primary hover:text-blue-700"
-                              title="Edit task"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
-                            </button>
-                            <button
-                              onClick={() => handleRemoveTask(task.id)}
-                              className="text-red-500 hover:text-red-700"
-                              title="Delete task"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </div>
+                      <div key={task.id} className="flex items-center p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold mr-4">
+                          {task.number}
                         </div>
-                        <div className="task-meta">
-                          Assignee: {users.find(u => u.id === task.assignee_id)?.name || 'Unknown'} → 
-                          Approver: {users.find(u => u.id === task.approver_id)?.name || 'Unknown'} | 
-                          Duration: {task.duration}
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900">{task.title}</h4>
+                          <p className="text-sm text-gray-600">
+                            Assignee: {users.find(u => u.id === task.assignee_id)?.name || 'Unknown'} → 
+                            Approver: {users.find(u => u.id === task.approver_id)?.name || 'Unknown'} | 
+                            Duration: {task.duration}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => handleEditTask(task)}
+                            className="text-primary hover:text-blue-700 p-1"
+                            title="Edit task"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => handleRemoveTask(task.id)}
+                            className="text-red-500 hover:text-red-700 p-1"
+                            title="Delete task"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  <div className="mt-6 text-center">
-                    {tasks.length < 2 && (
-                      <p className="text-sm text-orange-600 flex items-center justify-center mb-4">
-                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                        Add at least 2 tasks to create a workflow
-                      </p>
+                  <div className="text-center">
+                    {tasks.length >= 2 ? (
+                      <button
+                        onClick={handleNext}
+                        className="btn-primary"
+                      >
+                        Build Transition
+                      </button>
+                    ) : (
+                      <div>
+                        <button
+                          className="btn-primary opacity-50 cursor-not-allowed mb-2"
+                          disabled
+                        >
+                          Build Transition
+                        </button>
+                        <p className="text-sm text-orange-600 flex items-center justify-center">
+                          <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          Add at least 2 tasks to create a workflow
+                        </p>
+                      </div>
                     )}
-                    <button
-                      onClick={handleNext}
-                      disabled={!validateStep(2)}
-                      className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Build Transition
-                    </button>
                   </div>
                 </div>
               )}
-
-              <div className="flex justify-between mt-8">
-                <button
-                  onClick={handleBack}
-                  className="btn-secondary"
-                >
-                  Back
-                </button>
-              </div>
             </div>
           )}
 
+          {/* Step 3: Transition */}
           {currentStep === 3 && (
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Transition</h2>
+                <div className="flex items-center">
+                  <button
+                    onClick={handleBack}
+                    className="text-gray-500 hover:text-gray-700 mr-4"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <h2 className="text-xl font-semibold text-gray-900">Transition</h2>
+                </div>
               </div>
 
               <div className="mb-6">
@@ -1025,158 +1126,170 @@ const CreateWorkflow = () => {
                 </p>
               </div>
 
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Create transition rule</h3>
-                
-                <div className="grid grid-cols-3 gap-6">
-                  <div>
-                    <label className="form-label">Source task</label>
-                    <select
-                      value={currentTransition.sourceTask}
-                      onChange={(e) => setCurrentTransition({ 
-                        ...currentTransition, 
-                        sourceTask: e.target.value,
-                        targetTasks: [] // Reset target tasks when source changes
-                      })}
-                      className="form-input"
-                    >
-                      <option value="">Choose the task that triggers the transition</option>
-                      {tasks.map(task => (
-                        <option key={task.id} value={task.title}>{task.title}</option>
-                      ))}
-                    </select>
-                  </div>
+              <div className="grid grid-cols-12 gap-6">
+                {/* Left Side - Create Transition Rule */}
+                <div className="col-span-5">
+                  <div className="bg-gray-50 p-6 rounded-lg">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Create transition rule</h3>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="form-label">Source task</label>
+                        <select
+                          value={currentTransition.sourceTask}
+                          onChange={(e) => setCurrentTransition({ 
+                            ...currentTransition, 
+                            sourceTask: e.target.value,
+                            targetTasks: [] // Reset target tasks when source changes
+                          })}
+                          className="form-input"
+                        >
+                          <option value="">Choose the task that triggers the transition</option>
+                          {tasks.map(task => (
+                            <option key={task.id} value={task.title}>{task.title}</option>
+                          ))}
+                        </select>
+                      </div>
 
-                  <div>
-                    <label className="form-label">Condition</label>
-                    <select
-                      value={currentTransition.condition}
-                      onChange={(e) => setCurrentTransition({ ...currentTransition, condition: e.target.value })}
-                      className="form-input"
-                    >
-                      <option value="Approved">Approved</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
-                  </div>
+                      <div>
+                        <label className="form-label">Condition</label>
+                        <select
+                          value={currentTransition.condition}
+                          onChange={(e) => setCurrentTransition({ ...currentTransition, condition: e.target.value })}
+                          className="form-input"
+                        >
+                          <option value="Approved">Approved</option>
+                          <option value="Rejected">Rejected</option>
+                        </select>
+                      </div>
 
-                  <div>
-                    <label className="form-label">Then start task(s)</label>
-                    <select
-                      multiple
-                      value={currentTransition.targetTasks}
-                      onChange={(e) => setCurrentTransition({ 
-                        ...currentTransition, 
-                        targetTasks: Array.from(e.target.selectedOptions, option => option.value)
-                      })}
-                      className="form-input h-24"
-                    >
-                      {getAvailableTargetTasks(currentTransition.sourceTask).map(taskTitle => (
-                        <option key={taskTitle} value={taskTitle}>{taskTitle}</option>
-                      ))}
-                    </select>
-                    <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple tasks</p>
+                      <div>
+                        <label className="form-label">Then start task(s)</label>
+                        <select
+                          multiple
+                          value={currentTransition.targetTasks}
+                          onChange={(e) => setCurrentTransition({ 
+                            ...currentTransition, 
+                            targetTasks: Array.from(e.target.selectedOptions, option => option.value)
+                          })}
+                          className="form-input h-32"
+                        >
+                          {getAvailableTargetTasks(currentTransition.sourceTask).map(taskTitle => (
+                            <option key={taskTitle} value={taskTitle}>{taskTitle}</option>
+                          ))}
+                        </select>
+                        <p className="text-xs text-gray-500 mt-1">Select the next task(s) to start</p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center mt-6">
+                      <button
+                        onClick={() => setCurrentTransition({
+                          sourceTask: '',
+                          condition: 'Approved',
+                          targetTasks: []
+                        })}
+                        className="btn-secondary"
+                      >
+                        Reset
+                      </button>
+                      <button
+                        onClick={handleAddTransition}
+                        disabled={!currentTransition.sourceTask || currentTransition.targetTasks.length === 0}
+                        className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Add Transition
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center mt-4">
-                  <button
-                    onClick={() => setCurrentTransition({
-                      sourceTask: '',
-                      condition: 'Approved',
-                      targetTasks: []
-                    })}
-                    className="btn-secondary"
-                  >
-                    Reset
-                  </button>
-                  <button
-                    onClick={handleAddTransition}
-                    disabled={!currentTransition.sourceTask || currentTransition.targetTasks.length === 0}
-                    className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Add Transition
-                  </button>
-                </div>
-              </div>
-
-              {transitions.length > 0 && (
-                <div className="border border-gray-200 rounded-lg overflow-hidden mb-6">
-                  <table className="transition-table">
-                    <thead>
-                      <tr>
-                        <th>Source task</th>
-                        <th>Condition</th>
-                        <th>Then start task(s)</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {transitions.map((transition) => (
-                        <tr key={transition.id}>
-                          <td>{transition.sourceTask}</td>
-                          <td>
-                            <span className={transition.condition === 'Approved' ? 'condition-approved' : 'condition-rejected'}>
-                              {transition.condition}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="flex flex-wrap gap-1">
-                              {transition.targetTasks.map((task, index) => (
-                                <span key={index} className="task-tag">
-                                  {task}
-                                </span>
-                              ))}
-                            </div>
-                          </td>
-                          <td>
-                            <button
-                              onClick={() => handleRemoveTransition(transition.id)}
-                              className="text-red-500 hover:text-red-700"
-                              title="Delete transition"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </td>
+                {/* Right Side - Transition Rules Table */}
+                <div className="col-span-7">
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <table className="min-w-full">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Source task
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Condition
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Then start task(s)
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {transitions.length > 0 ? transitions.map((transition) => (
+                          <tr key={transition.id}>
+                            <td className="px-4 py-4 text-sm text-gray-900">{transition.sourceTask}</td>
+                            <td className="px-4 py-4">
+                              <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                transition.condition === 'Approved' 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
+                                {transition.condition}
+                              </span>
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="flex flex-wrap gap-1">
+                                {transition.targetTasks.map((task, index) => (
+                                  <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                                    {task}
+                                    {index < transition.targetTasks.length - 1 && ','}
+                                  </span>
+                                ))}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              <button
+                                onClick={() => handleRemoveTransition(transition.id)}
+                                className="text-red-500 hover:text-red-700"
+                                title="Delete transition"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </td>
+                          </tr>
+                        )) : (
+                          <tr>
+                            <td colSpan="4" className="px-4 py-8 text-center text-gray-500">
+                              No transition rules created yet
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                <h4 className="font-medium text-gray-900 mb-2">Workflow Summary:</h4>
-                <div className="text-sm text-gray-600">
-                  <p><strong>Name:</strong> {workflowData.name}</p>
-                  <p><strong>Tasks:</strong> {tasks.length} tasks created</p>
-                  <p><strong>Transitions:</strong> {transitions.length} transition rules defined</p>
-                  <p><strong>Category:</strong> {workflowData.category}</p>
-                  <p><strong>Priority:</strong> {workflowData.priority}</p>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <button
-                  onClick={handleBack}
-                  className="btn-secondary"
-                >
-                  Back
-                </button>
-                <div className="flex space-x-4">
-                  <button
-                    onClick={handleSave}
-                    className="btn-secondary"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={handlePublish}
-                    className="btn-primary"
-                  >
-                    Publish
-                  </button>
+                  <div className="flex justify-end space-x-4 mt-6">
+                    <button
+                      onClick={() => window.location.href = '/dashboard'}
+                      className="btn-secondary"
+                    >
+                      Back
+                    </button>
+                    <button
+                      onClick={handleSave}
+                      className="btn-secondary"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={handlePublish}
+                      className="btn-primary"
+                    >
+                      Publish
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1189,7 +1302,7 @@ const CreateWorkflow = () => {
         <div className="modal-overlay">
           <div className="modal-content">
             <h2 className="text-xl font-semibold mb-4">
-              {currentTask.title ? 'Edit Task' : 'Add Task'}
+              {editingTaskId ? 'Edit Task' : 'Add Task'}
             </h2>
             <div className="space-y-4">
               <div>
@@ -1259,19 +1372,10 @@ const CreateWorkflow = () => {
                 onClick={handleAddTask}
                 className="btn-primary"
               >
-                {currentTask.title && tasks.find(t => t.title === currentTask.title) ? 'Update Task' : 'Add Task'}
+                {editingTaskId ? 'Update Task' : 'Add Task'}
               </button>
               <button
-                onClick={() => {
-                  setShowTaskModal(false);
-                  setCurrentTask({
-                    title: '',
-                    description: '',
-                    assignee_id: '',
-                    approver_id: '',
-                    duration: '2d 3h:30m'
-                  });
-                }}
+                onClick={closeModal}
                 className="btn-secondary"
               >
                 Cancel
