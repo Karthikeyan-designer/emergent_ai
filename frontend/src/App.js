@@ -559,7 +559,6 @@ const CreateWorkflow = () => {
   const [transitions, setTransitions] = useState([]);
   const [users, setUsers] = useState([]);
   const [showTaskModal, setShowTaskModal] = useState(false);
-  const [showTransitionModal, setShowTransitionModal] = useState(false);
   const [currentTask, setCurrentTask] = useState({
     title: '',
     description: '',
@@ -602,7 +601,13 @@ const CreateWorkflow = () => {
 
   const handleAddTask = () => {
     if (currentTask.title && currentTask.assignee_id && currentTask.approver_id) {
-      setTasks([...tasks, { ...currentTask, id: Date.now().toString(), number: tasks.length + 1 }]);
+      const newTask = {
+        ...currentTask,
+        id: Date.now().toString(),
+        number: tasks.length + 1,
+        tempId: `task_${Date.now()}`
+      };
+      setTasks([...tasks, newTask]);
       setCurrentTask({
         title: '',
         description: '',
@@ -616,25 +621,45 @@ const CreateWorkflow = () => {
 
   const handleAddTransition = () => {
     if (currentTransition.sourceTask && currentTransition.targetTasks.length > 0) {
-      setTransitions([...transitions, { ...currentTransition, id: Date.now().toString() }]);
+      const newTransition = {
+        ...currentTransition,
+        id: Date.now().toString()
+      };
+      setTransitions([...transitions, newTransition]);
       setCurrentTransition({
         sourceTask: '',
         condition: 'Approved',
         targetTasks: []
       });
-      setShowTransitionModal(false);
     }
   };
 
   const handleRemoveTask = (taskId) => {
-    setTasks(tasks.filter(task => task.id !== taskId));
+    const updatedTasks = tasks.filter(task => task.id !== taskId);
+    // Renumber the remaining tasks
+    const renumberedTasks = updatedTasks.map((task, index) => ({
+      ...task,
+      number: index + 1
+    }));
+    setTasks(renumberedTasks);
+    
+    // Remove transitions that reference the deleted task
+    const taskToRemove = tasks.find(task => task.id === taskId);
+    if (taskToRemove) {
+      const updatedTransitions = transitions.filter(
+        transition => 
+          transition.sourceTask !== taskToRemove.title &&
+          !transition.targetTasks.includes(taskToRemove.title)
+      );
+      setTransitions(updatedTransitions);
+    }
   };
 
   const handleRemoveTransition = (transitionId) => {
     setTransitions(transitions.filter(transition => transition.id !== transitionId));
   };
 
-  const handlePublish = async () => {
+  const handleSave = async () => {
     try {
       // Create workflow
       const workflowResponse = await axios.post(`${API}/workflows`, {
@@ -644,31 +669,74 @@ const CreateWorkflow = () => {
 
       const workflowId = workflowResponse.data.id;
 
-      // Create tasks with transitions
+      // Create a mapping of task titles to their IDs for transitions
+      const taskIdMap = {};
+
+      // Create tasks first
+      for (const task of tasks) {
+        const taskResponse = await axios.post(`${API}/workflows/${workflowId}/tasks`, {
+          title: task.title,
+          description: task.description,
+          assignee_id: task.assignee_id,
+          approver_id: task.approver_id,
+          deadline: task.deadline || null,
+          transitions: [] // We'll update these after creating all tasks
+        });
+        taskIdMap[task.title] = taskResponse.data.id;
+      }
+
+      // Now update tasks with their transitions
       for (const task of tasks) {
         const taskTransitions = transitions
           .filter(t => t.sourceTask === task.title)
           .map(t => ({
             transition_type: t.condition.toLowerCase(),
-            target_task_ids: t.targetTasks,
+            target_task_ids: t.targetTasks.map(taskTitle => taskIdMap[taskTitle]).filter(Boolean),
             is_automatic: true
           }));
 
-        await axios.post(`${API}/workflows/${workflowId}/tasks`, {
-          title: task.title,
-          description: task.description,
-          assignee_id: task.assignee_id,
-          approver_id: task.approver_id,
-          transitions: taskTransitions
-        });
+        if (taskTransitions.length > 0) {
+          // Update the task with transitions
+          await axios.put(`${API}/tasks/${taskIdMap[task.title]}`, {
+            transitions: taskTransitions
+          });
+        }
       }
 
+      alert('Workflow saved successfully!');
+      return true;
+    } catch (error) {
+      console.error('Error saving workflow:', error);
+      alert('Error saving workflow');
+      return false;
+    }
+  };
+
+  const handlePublish = async () => {
+    const saved = await handleSave();
+    if (saved) {
       alert('Workflow published successfully!');
       window.location.href = '/dashboard';
-    } catch (error) {
-      console.error('Error publishing workflow:', error);
-      alert('Error publishing workflow');
     }
+  };
+
+  const validateStep = (step) => {
+    switch (step) {
+      case 1:
+        return workflowData.name.trim() !== '';
+      case 2:
+        return tasks.length >= 2;
+      case 3:
+        return true; // Transitions are optional
+      default:
+        return false;
+    }
+  };
+
+  const getAvailableTargetTasks = (sourceTask) => {
+    return tasks
+      .filter(task => task.title !== sourceTask)
+      .map(task => task.title);
   };
 
   if (user?.role !== 'admin') {
@@ -831,7 +899,7 @@ const CreateWorkflow = () => {
                 </button>
                 <button
                   onClick={handleNext}
-                  disabled={!workflowData.name}
+                  disabled={!validateStep(1)}
                   className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
@@ -877,8 +945,27 @@ const CreateWorkflow = () => {
                           <h4 className="task-title">{task.title}</h4>
                           <div className="ml-auto flex items-center space-x-2">
                             <button
+                              onClick={() => {
+                                setCurrentTask({
+                                  title: task.title,
+                                  description: task.description,
+                                  assignee_id: task.assignee_id,
+                                  approver_id: task.approver_id,
+                                  duration: task.duration
+                                });
+                                setShowTaskModal(true);
+                              }}
+                              className="text-primary hover:text-blue-700"
+                              title="Edit task"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+                            <button
                               onClick={() => handleRemoveTask(task.id)}
                               className="text-red-500 hover:text-red-700"
+                              title="Delete task"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -896,16 +983,18 @@ const CreateWorkflow = () => {
                   </div>
 
                   <div className="mt-6 text-center">
-                    <p className="text-sm text-orange-600 flex items-center justify-center">
-                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                      Add at least 2 tasks to create a workflow
-                    </p>
+                    {tasks.length < 2 && (
+                      <p className="text-sm text-orange-600 flex items-center justify-center mb-4">
+                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        Add at least 2 tasks to create a workflow
+                      </p>
+                    )}
                     <button
                       onClick={handleNext}
-                      disabled={tasks.length < 2}
-                      className="btn-primary mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={!validateStep(2)}
+                      className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Build Transition
                     </button>
@@ -944,7 +1033,11 @@ const CreateWorkflow = () => {
                     <label className="form-label">Source task</label>
                     <select
                       value={currentTransition.sourceTask}
-                      onChange={(e) => setCurrentTransition({ ...currentTransition, sourceTask: e.target.value })}
+                      onChange={(e) => setCurrentTransition({ 
+                        ...currentTransition, 
+                        sourceTask: e.target.value,
+                        targetTasks: [] // Reset target tasks when source changes
+                      })}
                       className="form-input"
                     >
                       <option value="">Choose the task that triggers the transition</option>
@@ -975,13 +1068,13 @@ const CreateWorkflow = () => {
                         ...currentTransition, 
                         targetTasks: Array.from(e.target.selectedOptions, option => option.value)
                       })}
-                      className="form-input"
+                      className="form-input h-24"
                     >
-                      {tasks.filter(task => task.title !== currentTransition.sourceTask).map(task => (
-                        <option key={task.id} value={task.title}>{task.title}</option>
+                      {getAvailableTargetTasks(currentTransition.sourceTask).map(taskTitle => (
+                        <option key={taskTitle} value={taskTitle}>{taskTitle}</option>
                       ))}
                     </select>
-                    <p className="text-xs text-gray-500 mt-1">Select the next task(s) to start</p>
+                    <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple tasks</p>
                   </div>
                 </div>
 
@@ -1007,14 +1100,14 @@ const CreateWorkflow = () => {
               </div>
 
               {transitions.length > 0 && (
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <div className="border border-gray-200 rounded-lg overflow-hidden mb-6">
                   <table className="transition-table">
                     <thead>
                       <tr>
                         <th>Source task</th>
                         <th>Condition</th>
                         <th>Then start task(s)</th>
-                        <th></th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1039,6 +1132,7 @@ const CreateWorkflow = () => {
                             <button
                               onClick={() => handleRemoveTransition(transition.id)}
                               className="text-red-500 hover:text-red-700"
+                              title="Delete transition"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -1052,7 +1146,18 @@ const CreateWorkflow = () => {
                 </div>
               )}
 
-              <div className="flex justify-between items-center mt-8">
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <h4 className="font-medium text-gray-900 mb-2">Workflow Summary:</h4>
+                <div className="text-sm text-gray-600">
+                  <p><strong>Name:</strong> {workflowData.name}</p>
+                  <p><strong>Tasks:</strong> {tasks.length} tasks created</p>
+                  <p><strong>Transitions:</strong> {transitions.length} transition rules defined</p>
+                  <p><strong>Category:</strong> {workflowData.category}</p>
+                  <p><strong>Priority:</strong> {workflowData.priority}</p>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center">
                 <button
                   onClick={handleBack}
                   className="btn-secondary"
@@ -1061,7 +1166,7 @@ const CreateWorkflow = () => {
                 </button>
                 <div className="flex space-x-4">
                   <button
-                    onClick={() => alert('Workflow saved as draft!')}
+                    onClick={handleSave}
                     className="btn-secondary"
                   >
                     Save
@@ -1083,7 +1188,9 @@ const CreateWorkflow = () => {
       {showTaskModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2 className="text-xl font-semibold mb-4">Add Task</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              {currentTask.title ? 'Edit Task' : 'Add Task'}
+            </h2>
             <div className="space-y-4">
               <div>
                 <label className="form-label">Task Title</label>
@@ -1152,10 +1259,19 @@ const CreateWorkflow = () => {
                 onClick={handleAddTask}
                 className="btn-primary"
               >
-                Add Task
+                {currentTask.title && tasks.find(t => t.title === currentTask.title) ? 'Update Task' : 'Add Task'}
               </button>
               <button
-                onClick={() => setShowTaskModal(false)}
+                onClick={() => {
+                  setShowTaskModal(false);
+                  setCurrentTask({
+                    title: '',
+                    description: '',
+                    assignee_id: '',
+                    approver_id: '',
+                    duration: '2d 3h:30m'
+                  });
+                }}
                 className="btn-secondary"
               >
                 Cancel
