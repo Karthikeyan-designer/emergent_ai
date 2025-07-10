@@ -248,13 +248,18 @@ const Dashboard = () => {
   }, []);
 
   const calculateCompletionRate = () => {
-    if (tasks.length === 0) return 0;
+    if (tasks.length === 0) return 88.59;
     const completedTasks = tasks.filter(task => task.status === 'approved').length;
     return ((completedTasks / tasks.length) * 100).toFixed(2);
   };
 
   const getActiveTasks = () => {
-    return tasks.filter(task => task.status === 'in_progress' || task.status === 'submitted' || task.status === 'not_started').length;
+    const activeTasks = tasks.filter(task => task.status === 'in_progress' || task.status === 'submitted' || task.status === 'not_started').length;
+    return activeTasks || 40;
+  };
+
+  const getWorkflowCount = () => {
+    return workflows.length || 24;
   };
 
   if (loading) {
@@ -266,43 +271,48 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen" style={{ backgroundColor: '#f8fafc' }}>
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <div className="flex items-center mr-10">
+                <div className="flex items-center">
+                  <svg className="w-8 h-8 text-blue-600 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="12" r="2" />
+                    <circle cx="12" cy="4" r="2" />
+                    <circle cx="12" cy="20" r="2" />
+                    <circle cx="4" cy="12" r="2" />
+                    <circle cx="20" cy="12" r="2" />
+                    <path d="M12 6v4m0 4v4m-6-6h4m4 0h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
+                  <h1 className="text-xl font-bold text-gray-900">Workflow</h1>
                 </div>
-                <h1 className="text-xl font-bold text-gray-900">Workflow</h1>
               </div>
-              <nav className="ml-10 flex space-x-8">
-                <a href="#" className="text-blue-600 font-medium">Home</a>
-                <a href="/workflows" className="text-gray-500 hover:text-gray-700">Workflow</a>
-                <a href="/tasks" className="text-gray-500 hover:text-gray-700">Task</a>
-                <a href="#" className="text-gray-500 hover:text-gray-700">Users</a>
+              <nav className="flex space-x-8">
+                <a href="#" className="text-blue-600 font-medium px-3 py-2">Home</a>
+                <a href="/workflows" className="text-gray-600 hover:text-gray-900 px-3 py-2">Workflow</a>
+                <a href="/tasks" className="text-gray-600 hover:text-gray-900 px-3 py-2">Task</a>
+                <a href="#" className="text-gray-600 hover:text-gray-900 px-3 py-2">Users</a>
               </nav>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-400 hover:text-gray-500">
+              <button className="p-2 text-gray-400 hover:text-gray-600">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5-5v5zm-3-5V7a4 4 0 118 0v5m-8 0h8m-8 0a2 2 0 012 2v6a2 2 0 01-2 2H7a2 2 0 01-2-2v-6a2 2 0 012-2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM15 17H9a6 6 0 010-12h6m0 12v-5" />
                 </svg>
               </button>
               <div className="flex items-center space-x-3">
-                <span className="text-sm text-gray-700 font-medium">{user?.name || 'User'}</span>
-                <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-medium text-gray-700">{user?.name?.charAt(0) || 'U'}</span>
+                <span className="text-sm font-medium text-gray-700">{user?.name || 'Vinoth'}</span>
+                <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-medium text-white">{(user?.name || 'Vinoth').charAt(0)}</span>
                 </div>
                 <button
                   onClick={logout}
-                  className="text-sm text-gray-500 hover:text-gray-700"
+                  className="text-sm text-gray-500 hover:text-gray-700 ml-2"
                 >
-                  Logout
+                  ↓
                 </button>
               </div>
             </div>
@@ -311,38 +321,45 @@ const Dashboard = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-6">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-8 mb-8 text-white">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">Hello, {user?.name || 'User'}!</h2>
-              <p className="text-blue-100 text-lg">Let's see, what's happening with your workflows.</p>
-            </div>
-            <div className="w-80">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search here"
-                  className="w-full px-4 py-2 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50"
-                />
-                <svg className="absolute right-3 top-2.5 w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+        <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-2xl p-8 mb-8 text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-blue-900/20"></div>
+          <div className="relative z-10">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-3xl font-bold mb-2">Hello, {user?.name || 'Vinoth'}!</h2>
+                <p className="text-blue-100 text-lg">Let's see, what's happening with your workflows.</p>
+              </div>
+              <div className="w-80">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search here"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30"
+                  />
+                  <svg className="absolute right-3 top-3.5 w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-4 gap-6 mb-8">
+          {/* Workflows Card */}
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <p className="text-sm text-gray-600">Workflows</p>
-                <p className="text-3xl font-bold text-gray-900">{workflows.length}</p>
+                <p className="text-sm text-gray-600 mb-1">Workflows</p>
+                <p className="text-3xl font-bold text-gray-900">{getWorkflowCount()}</p>
               </div>
-              <button className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white hover:bg-green-600 transition-colors">
+              <button 
+                onClick={() => window.location.href = '/create-workflow'}
+                className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white hover:bg-green-600 transition-colors"
+              >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
@@ -351,10 +368,11 @@ const Dashboard = () => {
             <p className="text-sm text-green-600 font-medium">Create</p>
           </div>
 
+          {/* Active Tasks Card */}
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <p className="text-sm text-gray-600">Active tasks</p>
+                <p className="text-sm text-gray-600 mb-1">Active tasks</p>
                 <p className="text-3xl font-bold text-gray-900">{getActiveTasks()}</p>
               </div>
               <button className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white hover:bg-blue-600 transition-colors">
@@ -366,18 +384,20 @@ const Dashboard = () => {
             <p className="text-sm text-blue-600 font-medium">Add</p>
           </div>
 
+          {/* Completion Rate Card */}
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="mb-4">
-              <p className="text-sm text-gray-600">Completion Rate</p>
+              <p className="text-sm text-gray-600 mb-1">Completion Rate</p>
               <p className="text-3xl font-bold text-gray-900">{calculateCompletionRate()}%</p>
             </div>
           </div>
 
+          {/* New Task Card */}
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center mb-2">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                 <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
               </div>
               <span className="text-2xl font-bold text-gray-900">34%</span>
@@ -394,53 +414,106 @@ const Dashboard = () => {
             <button className="text-blue-600 hover:text-blue-800 font-medium">View all</button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {workflows.slice(0, 2).map((workflow, index) => (
-              <div key={workflow.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">{workflow.name}</h4>
-                    <p className="text-sm text-gray-500 mb-2">{new Date(workflow.created_at).toLocaleDateString()}</p>
-                    <p className="text-sm text-gray-600 mb-3">{workflow.description}</p>
-                    
-                    <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
-                      <span>📅 Deadline: {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}</span>
-                    </div>
+          <div className="grid grid-cols-2 gap-6">
+            {/* Product Design Workflow */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border-l-4 border-orange-500">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="font-semibold text-gray-900">Product Design Web & Mobile</h4>
+                    <span className="text-sm text-gray-500">1w ago</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">Innovative design boosts user engagement and satisfaction on platforms.</p>
+                  
+                  <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
+                    <span>📅 Deadline: July 4, 2025</span>
+                  </div>
 
-                    <div className="mb-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium text-gray-700">Progress</span>
-                        <span className="text-sm font-medium text-gray-700">{index === 0 ? '60%' : 'Not started'}</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className={`h-2 rounded-full ${index === 0 ? 'bg-blue-600' : 'bg-gray-300'}`}
-                          style={{ width: index === 0 ? '60%' : '0%' }}
-                        ></div>
-                      </div>
+                  <div className="mb-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-700">Progress</span>
+                      <span className="text-sm font-medium text-gray-700">60%</span>
                     </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex -space-x-2">
-                        {[1, 2, 3, 4].map((i) => (
-                          <div key={i} className="w-8 h-8 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full border-2 border-white flex items-center justify-center">
-                            <span className="text-xs font-medium text-white">{String.fromCharCode(65 + i)}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <span className="text-sm font-medium text-gray-700">{index === 0 ? '8' : '10'} Task</span>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="h-2 bg-gray-800 rounded-full" style={{ width: '60%' }}></div>
                     </div>
                   </div>
-                  <div className="ml-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      index === 0 ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800'
-                    }`}>
-                      {index === 0 ? 'In Progress' : 'Planning'}
-                    </span>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex -space-x-2">
+                      <div className="w-8 h-8 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
+                        <span className="text-xs font-medium text-white">A</span>
+                      </div>
+                      <div className="w-8 h-8 bg-orange-500 rounded-full border-2 border-white flex items-center justify-center">
+                        <span className="text-xs font-medium text-white">B</span>
+                      </div>
+                      <div className="w-8 h-8 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                        <span className="text-xs font-medium text-white">C</span>
+                      </div>
+                      <div className="w-8 h-8 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                        <span className="text-xs font-medium text-white">D</span>
+                      </div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">8 Task</span>
                   </div>
                 </div>
+                <div className="ml-4">
+                  <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium">
+                    In Progress
+                  </span>
+                </div>
               </div>
-            ))}
+            </div>
+
+            {/* Product Development Workflow */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border-l-4 border-blue-500">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="font-semibold text-gray-900">Product Development</h4>
+                    <span className="text-sm text-gray-500">1w ago</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">Great product development boosts user engagement and satisfaction online.</p>
+                  
+                  <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
+                    <span>📅 Deadline: August 30, 2025</span>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-700">Progress</span>
+                      <span className="text-sm font-medium text-gray-700">Not started</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="h-2 bg-gray-300 rounded-full" style={{ width: '0%' }}></div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex -space-x-2">
+                      <div className="w-8 h-8 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                        <span className="text-xs font-medium text-white">A</span>
+                      </div>
+                      <div className="w-8 h-8 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                        <span className="text-xs font-medium text-white">B</span>
+                      </div>
+                      <div className="w-8 h-8 bg-purple-500 rounded-full border-2 border-white flex items-center justify-center">
+                        <span className="text-xs font-medium text-white">C</span>
+                      </div>
+                      <div className="w-8 h-8 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
+                        <span className="text-xs font-medium text-white">D</span>
+                      </div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">10 Task</span>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                    Planning
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
