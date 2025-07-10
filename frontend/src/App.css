@@ -322,8 +322,8 @@
 }
 
 /* Transition utilities */
-.transition-all {
-  @apply transition-all duration-200 ease-in-out;
+.transition-all-custom {
+  transition: all 0.2s ease-in-out;
 }
 
 /* Shadow utilities */
