@@ -263,11 +263,7 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus:
-    - "Authentication System"
-    - "Workflow Management"
-    - "Multi-Task Transition Engine"
-    - "Task Submission System"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
